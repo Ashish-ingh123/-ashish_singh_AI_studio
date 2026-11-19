@@ -1,6 +1,6 @@
 # Ashish Singh · Portfolio
 
-[![CI](https://github.com/Ashish-singh123/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Ashish-singh123/portfolio/actions/workflows/ci.yml)
+[![CI](https://github.com/Ashish-ingh123/-ashish_singh_AI_studio/actions/workflows/ci.yml/badge.svg)](https://github.com/Ashish-ingh123/-ashish_singh_AI_studio/actions/workflows/ci.yml)
 
 Personal portfolio site for Ashish Singh, Software Engineer (full-stack: C#, .NET, SQL Server,
 React; AI integration with RAG and LLMs). A single page presents the services he offers, his
