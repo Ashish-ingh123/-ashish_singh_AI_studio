@@ -1,0 +1,87 @@
+/*
+  Styles for the command palette (command-palette.tsx). Imported by globals.css.
+  Use the design tokens (var(--accent), var(--border) and so on), never raw colours.
+
+  The palette is a native <dialog>. The browser puts an open modal dialog in a layer of
+  its own above the whole page, and gives it a ::backdrop, the area behind it. Tailwind
+  removes the browser's own centring of dialogs, so the position is set here.
+*/
+
+@layer components {
+  .palette {
+    width: min(36rem, calc(100vw - 2rem));
+    max-height: min(32rem, calc(100dvh - 6rem));
+    margin: 12dvh auto auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--card-edge);
+    border-radius: 1rem;
+    background: var(--card);
+    color: var(--foreground);
+    box-shadow: 0 30px 80px -20px var(--glow);
+  }
+
+  /* A see-through wash of the page colour, so the page stays visible but recedes. */
+  .palette::backdrop {
+    background: color-mix(in oklab, var(--background) 70%, transparent);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Only an open dialog is laid out; a closed one must keep display: none. */
+  .palette[open] {
+    display: flex;
+    animation: palette-in 0.15s ease-out;
+  }
+
+  .palette[open]::backdrop {
+    animation: palette-fade 0.15s ease-out;
+  }
+
+  /* The panel fills the dialog, so a click on the dialog itself is a click outside. */
+  .palette-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /*
+    The text box shows no ring of its own: the highlighted line in the list is what
+    shows where the keyboard is, and the box is the only thing that can hold focus.
+  */
+  .palette-input:focus-visible {
+    outline: none;
+  }
+
+  /* contain: scrolling to the end of the list does not start scrolling the page. */
+  .palette-list {
+    flex: 1;
+    min-height: 0;
+    padding: 0 0.5rem 0.5rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes palette-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette[open],
+  .palette[open]::backdrop {
+    animation: none;
+  }
+}

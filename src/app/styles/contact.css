@@ -1,0 +1,85 @@
+/*
+  Styles for the contact part of the homepage. Imported by globals.css.
+  Use the design tokens (var(--accent), var(--border) and so on), never raw colours.
+*/
+
+@layer components {
+  /*
+    A soft violet glow behind the contact details, so the page ends on a lit spot instead
+    of a flat background. It is one radial gradient that fades to nothing at its edge, in
+    the same colour as the glows behind the page. It breathes slowly using transform and
+    opacity only, which the browser can animate without repainting the page.
+  */
+  .contact-halo {
+    position: absolute;
+    /* A little taller than the content, never wider than it, and centred. */
+    inset: -2.5rem 0;
+    z-index: -1;
+    max-width: 44rem;
+    margin-inline: auto;
+    background: radial-gradient(closest-side, var(--backdrop-glow), transparent);
+    pointer-events: none;
+    animation: contact-halo-breathe 8s ease-in-out infinite alternate;
+  }
+
+  /*
+    The place the "Send your requirement" form is loaded into (contact-form-loader.tsx).
+    It is given the height of the form at rest, so the card does not grow, and nothing
+    below it moves, when the form arrives. A phone stacks the fields one to a row; from
+    sm they go two to a row.
+  */
+  .contact-form-holder {
+    min-height: 56rem;
+  }
+
+  @media (min-width: 40rem) {
+    .contact-form-holder {
+      min-height: 38.75rem;
+    }
+  }
+
+  /* Without script the form never arrives, so the holder keeps no room for it. */
+  @media (scripting: none) {
+    .contact-form-holder {
+      min-height: 0;
+    }
+  }
+
+  /*
+    The trap field of the form: moved off the screen instead of display: none, because
+    programs that fill in forms often skip fields that are not displayed.
+  */
+  .contact-trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+}
+
+/* The scale stops at 1, so the glow never grows past its box and cannot cause scrolling. */
+@keyframes contact-halo-breathe {
+  from {
+    opacity: 0.6;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Visitors who ask for less motion get a still glow. */
+@media (prefers-reduced-motion: reduce) {
+  .contact-halo {
+    animation: none;
+  }
+}
+
+/* Windows high-contrast mode: the visitor chose their own colours, so drop the decoration. */
+@media (forced-colors: active) {
+  .contact-halo {
+    display: none;
+  }
+}

@@ -1,0 +1,89 @@
+/*
+  Styles for the logo (src/components/logo.tsx). Imported by globals.css.
+  Use the design tokens (var(--logo-mark), var(--foreground) and so on), never raw colours.
+
+  The logo follows the theme without any script of its own: every colour here is a token,
+  and next-themes swaps the tokens by changing the class on <html> before the first paint.
+
+  Which token colours which part:
+
+    hexagon          --logo-mark         the same violet in both themes
+    A and crossbar   --on-brand          white in both themes
+    dot              --logo-dot          the text colour on the light page, a light
+                                         violet on the dark one
+    "ash"            --foreground
+    "line"           --logo-mark on the light page, where it matches the hexagon;
+                     --accent on the dark one, where that violet would be too dim to read
+    tagline          --muted-foreground
+*/
+
+@layer components {
+  .logo-mark {
+    flex-shrink: 0;
+    /* The outline of a shape at the very edge would otherwise lose half its width. */
+    overflow: visible;
+  }
+
+  .logo-hexagon {
+    fill: var(--logo-mark);
+    stroke: var(--logo-mark);
+  }
+
+  .logo-letter {
+    fill: none;
+    stroke: var(--on-brand);
+  }
+
+  .logo-dot {
+    fill: var(--logo-dot);
+  }
+
+  .logo-lead {
+    color: var(--foreground);
+  }
+
+  .logo-accent {
+    color: var(--logo-mark);
+  }
+
+  .dark .logo-accent {
+    color: var(--accent);
+  }
+
+  .logo-tagline {
+    color: var(--muted-foreground);
+  }
+
+  /*
+    The header's logo (the component's `animated` option). Each time it is hovered the
+    dot runs once along the crossbar, from the crossbar's left end to the dot's own place
+    beside the hexagon. --logo-trip, which the component sets on the dot, says how far
+    back that start is. The run takes 350ms and moves with transform alone. Nothing
+    plays when the page loads.
+
+    hover: hover is true where the main pointer can rest over things: a mouse or a
+    trackpad. Without it a tap on a phone would play the run at the moment of leaving
+    the page.
+  */
+  @media (hover: hover) {
+    .logo-animated:hover .logo-dot {
+      animation: logo-dot-travel 0.35s ease-out;
+    }
+  }
+}
+
+@keyframes logo-dot-travel {
+  from {
+    transform: translateX(var(--logo-trip));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Visitors who ask for less motion get the logo as it is drawn: the dot stays put. */
+@media (prefers-reduced-motion: reduce) {
+  .logo-animated:hover .logo-dot {
+    animation: none;
+  }
+}

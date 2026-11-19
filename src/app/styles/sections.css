@@ -1,0 +1,30 @@
+/*
+  Styles for the sections part of the homepage. Imported by globals.css.
+  Use the design tokens (var(--accent), var(--border) and so on), never raw colours.
+
+  Section headings rise in word by word the first time they scroll into view
+  (section.tsx). seen-list.tsx marks the heading: data-armed="true" when it is still off
+  screen as the page loads, then data-seen="true" when it arrives. Words are hidden only
+  on a heading that is armed and not yet seen, so nothing is hidden without script, and a
+  heading that is already on screen when the page loads is left alone.
+
+  Everything sits inside "no-preference": visitors who ask for less motion get plain
+  headings.
+*/
+
+@media (prefers-reduced-motion: no-preference) {
+  /* inline-block, because a transform does nothing to plain inline text. */
+  .heading-word {
+    display: inline-block;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+    transition-delay: calc(var(--i) * var(--step));
+  }
+
+  .heading-reveal[data-armed="true"][data-seen="false"] .heading-word {
+    opacity: 0;
+    transform: translateY(0.35em);
+    transition: none;
+  }
+}

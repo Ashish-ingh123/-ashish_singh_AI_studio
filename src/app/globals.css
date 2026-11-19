@@ -1,26 +1,620 @@
 @import "tailwindcss";
 
+/* Section-specific styles, one file each so they can be worked on independently. */
+@import "./styles/hero.css";
+@import "./styles/services.css";
+@import "./styles/pipeline.css";
+@import "./styles/experience.css";
+@import "./styles/skills.css";
+@import "./styles/projects.css";
+@import "./styles/sections.css";
+@import "./styles/contact.css";
+@import "./styles/case-study.css";
+@import "./styles/palette.css";
+@import "./styles/ask.css";
+@import "./styles/spotlight.css";
+@import "./styles/logo.css";
+
+/*
+  Tailwind's `dark:` variant normally follows the OS setting. This makes it follow the
+  "dark" class that next-themes puts on <html>, so the toggle controls it.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Design tokens. Think of these as the appsettings of the UI: components never use raw
+  colours, only these names. Switching the class on <html> swaps every value at once.
+  The dark values are the default look (deep aubergine lit by violet); the light values
+  are the same palette turned over for visitors who switch themes.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8ff;
+  --foreground: #1a1033;
+  --muted: #f0eafc;
+  --muted-foreground: #574a70;
+  --card: #ffffff;
+  --card-foreground: #1a1033;
+  --border: #e2d8f5;
+  --accent: #6d28d9;
+  --accent-foreground: #ffffff;
+  --ring: #6d28d9;
+  /* Soft accent-tinted shadow for hover states. */
+  --glow: rgb(124 58 237 / 0.3);
+
+  /* Filled buttons: a violet gradient with white text in both themes. */
+  --brand-from: #6d28d9;
+  --brand-to: #8b3dff;
+  --on-brand: #ffffff;
+
+  /* Gradient for highlighted words. */
+  --text-gradient-from: #6d28d9;
+  --text-gradient-to: #a855f7;
+
+  /* Card surface: a violet sheen in the middle and a coloured top edge. */
+  --card-sheen: rgb(124 58 237 / 0.1);
+  --card-edge: #8b3dff;
+  /*
+    On the near-white page a card needs a shadow to lift it off the background; on the
+    dark page its sheen already does that, so there the shadow is "none".
+  */
+  --card-shadow:
+    0 1px 2px rgb(26 16 51 / 0.05), 0 14px 30px -18px rgb(109 40 217 / 0.3);
+
+  /* Strength of the glows behind the page and behind the orb. */
+  --backdrop-glow: rgb(139 61 255 / 0.13);
+  --orb-glow: rgb(139 61 255 / 0.3);
+
+  /* The orb itself: a lit sphere, the same in both themes. */
+  --orb-light: #a56bff;
+  --orb-mid: #7c3aed;
+  --orb-dark: #4c1d95;
+
+  /*
+    The logo (styles/logo.css). Its hexagon is the same violet in both themes; the dot
+    beside it is the text colour here and a light violet on the dark page.
+  */
+  --logo-mark: #7c3aed;
+  --logo-dot: var(--foreground);
 }
 
+.dark {
+  --background: #11071f;
+  --foreground: #f5f1fc;
+  --muted: #1d1033;
+  --muted-foreground: #b9aed0;
+  --card: #150a28;
+  --card-foreground: #f5f1fc;
+  --border: #2c1b4a;
+  --accent: #b78cff;
+  --accent-foreground: #14082a;
+  --ring: #b78cff;
+  --glow: rgb(139 61 255 / 0.45);
+
+  --text-gradient-from: #8b5cf6;
+  --text-gradient-to: #d8b4fe;
+
+  --card-sheen: rgb(113 39 186 / 0.4);
+  --card-edge: #7c3aed;
+  --card-shadow: none;
+
+  --backdrop-glow: rgb(113 39 186 / 0.3);
+  --orb-glow: rgb(139 61 255 / 0.55);
+
+  --logo-dot: #c4a1ff;
+}
+
+/* Expose the tokens to Tailwind so classes like bg-card or text-muted-foreground exist. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-on-brand: var(--on-brand);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Headings. Falls back to the body font while Poppins loads. */
+  --font-display: var(--font-poppins), var(--font-geist-sans), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+  The type scale. Every text size on the site is one of these steps, so the same kind of
+  text is the same size wherever it appears:
+
+    hero headline     .hero-statement in styles/hero.css   32px to 72px
+    text-heading      section headings and page titles     28px to 40px
+    text-title        one thing inside a section: a job,
+                      a project                            24px to 30px
+    text-lg           card titles and intro paragraphs     18px
+    text-base         running text                         16px
+    text-sm           text inside cards, labels            14px
+    text-xs           chips and captions                   12px
+
+  The two steps declared here are this site's own; the others are Tailwind's. Each becomes
+  a utility class of the same name, and the --line-height and --letter-spacing lines make
+  that class set those properties too, the way a named style does in Word. clamp() slides
+  the size between its first and last value as the screen widens.
+*/
+@theme {
+  --text-heading: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+  --text-heading--line-height: 1.12;
+  --text-heading--letter-spacing: -0.02em;
+  --text-title: clamp(1.5rem, 1.35rem + 0.7vw, 1.875rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.015em;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Keep anchored sections clear of the sticky header. */
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  /* Same stack as the font-display utility defined in the theme block above. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-poppins), var(--font-geist-sans), sans-serif;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+
+  /* One visible focus ring for every keyboard user, in both themes. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Violet gradient fill for buttons and the scroll progress bar. */
+  .brand-gradient {
+    background-image: linear-gradient(135deg, var(--brand-from), var(--brand-to));
+  }
+
+  /* Gradient-coloured text: the letters are transparent and show the background. */
+  .text-gradient {
+    background-image: linear-gradient(
+      90deg,
+      var(--text-gradient-from),
+      var(--text-gradient-to)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /*
+    Card surface, after the reference design: a dark panel with a violet sheen in the
+    middle and a brighter violet line along the top edge.
+  */
+  .glass-card {
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--card-edge);
+    background:
+      radial-gradient(70% 130% at 50% 50%, var(--card-sheen), transparent 100%),
+      var(--card);
+    box-shadow: var(--card-shadow);
+  }
+
+  .glass-card:hover {
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+    border-top-color: var(--card-edge);
+    box-shadow: 0 18px 44px -18px var(--glow);
+  }
+
+  /*
+    Page backdrop: two soft violet glows fixed behind everything, drifting slowly.
+    They are radial gradients moved with transform only, which the browser can animate
+    without repainting the page.
+  */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .backdrop-glow {
+    position: absolute;
+    width: 56rem;
+    height: 56rem;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, var(--backdrop-glow), transparent);
+    animation: glow-drift 24s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .backdrop-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /*
+    Parallax: the two layers slide up as the page is scrolled, by different amounts, so
+    the glows seem to lie at different depths behind the page. animation-timeline ties an
+    animation's progress to the scroll position instead of to the clock: at the top of
+    the page it is at its start, at the bottom at its end. The browser runs it without
+    any script, and moves the layers with transform alone. Browsers that do not know
+    animation-timeline skip the whole block and keep the glows where they are, and so do
+    visitors who prefer reduced motion.
+  */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .backdrop-layer {
+        animation: backdrop-parallax linear both;
+        animation-timeline: scroll(root);
+      }
+
+      .backdrop-layer-a {
+        --parallax: -14vh;
+      }
+
+      .backdrop-layer-b {
+        --parallax: -34vh;
+      }
+    }
+  }
+
+  .backdrop-glow-a {
+    top: -22rem;
+    left: -20rem;
+  }
+
+  .backdrop-glow-b {
+    right: -22rem;
+    bottom: -26rem;
+    animation-duration: 30s;
+    animation-direction: alternate-reverse;
+  }
+
+  /*
+    The orb: a lit sphere with a glow behind it and two tilted rings around it.
+    Each ring is a plain circle that its parent squashes into an ellipse with scaleY.
+    A dot sits on the circle and the circle spins, so the dot travels round the ellipse;
+    the dot applies the opposite rotation and stretch so that it stays round.
+  */
+  .orb {
+    position: relative;
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    animation: orb-float 7s ease-in-out infinite alternate;
+  }
+
+  .orb-glow {
+    position: absolute;
+    inset: -30%;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, var(--orb-glow), transparent);
+    animation: orb-pulse 5s ease-in-out infinite alternate;
+  }
+
+  .orb-core {
+    position: relative;
+    display: grid;
+    width: 48%;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle at 30% 25%,
+      var(--orb-light) 0%,
+      var(--orb-mid) 38%,
+      var(--orb-dark) 100%
+    );
+    box-shadow:
+      0 0 3.5rem 0 var(--glow),
+      inset 0 -0.75rem 1.75rem rgb(17 7 31 / 0.45),
+      inset 0 0.25rem 0.75rem rgb(255 255 255 / 0.22);
+    color: var(--on-brand);
+    /*
+      Makes the sphere a "container", so that its own width is available to what is inside
+      it as a unit: 100cqw is the sphere's full width.
+    */
+    container-type: inline-size;
+  }
+
+  /*
+    The initials are part of the drawing, not text on the type scale: 30cqw is three
+    tenths of the sphere's width, so they fit an orb of any size.
+  */
+  .orb-initials {
+    font-size: 30cqw;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .orb-rings {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .orbit {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--orbit-tilt)) scale(var(--orbit-size))
+      scaleY(var(--orbit-squash));
+  }
+
+  .orbit-a {
+    --orbit-tilt: -18deg;
+    --orbit-size: 1;
+    --orbit-squash: 0.3;
+    --orbit-time: 16s;
+  }
+
+  .orbit-b {
+    --orbit-tilt: 16deg;
+    --orbit-size: 0.8;
+    --orbit-squash: 0.38;
+    --orbit-time: 24s;
+  }
+
+  .orbit-half {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The copy drawn above the sphere shows only the near half of each ring. */
+  .orb-rings-front .orbit-half {
+    clip-path: inset(50% -25% -25% -25%);
+  }
+
+  .orbit-spin {
+    position: absolute;
+    inset: 0;
+    border: 2px solid color-mix(in oklab, var(--accent) 45%, transparent);
+    border-radius: 9999px;
+    animation: orbit-spin var(--orbit-time) linear infinite;
+  }
+
+  .orbit-dot {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin: -0.25rem 0 0 -0.25rem;
+    border-radius: 9999px;
+    background: var(--accent);
+    box-shadow: 0 0 0.75rem 0.125rem var(--glow);
+    transform: scaleY(calc(1 / var(--orbit-squash)));
+    animation: orbit-dot var(--orbit-time) linear infinite;
+  }
+
+  .orbit-b .orbit-spin,
+  .orbit-b .orbit-dot {
+    animation-direction: reverse;
+  }
+
+  /* The caret after the typed role. It blinks while typing and fades out when done. */
+  .typed-caret {
+    display: inline-block;
+    width: 0.08em;
+    height: 1em;
+    margin-left: 0.1em;
+    vertical-align: -0.12em;
+    background-color: currentColor;
+    animation: caret-blink 0.9s steps(1, end) infinite;
+    transition: opacity 0.3s ease-out;
+  }
+
+  .typed-caret[data-done="true"] {
+    opacity: 0;
+    animation: none;
+  }
+
+  /* The hand-drawn ring round the highlighted word: an ellipse made from a border. */
+  .highlight-ring {
+    position: absolute;
+    inset: -0.06em -0.32em -0.02em;
+    border: 1.5px solid color-mix(in oklab, var(--foreground) 70%, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: rotate(-4deg);
+    animation: ring-in 0.35s ease-out 0.5s backwards;
+  }
+
+  /*
+    A text link's underline, drawn in from the left when its link is hovered or reached
+    with the keyboard. It goes on a span round the words, inside the link, so that it
+    does not run under an icon beside them.
+
+    The line is a background: a strip in the text's own colour along the bottom of the
+    words, zero wide until the link is hovered. A real underline cannot be animated like
+    this. box-decoration-break gives every row its own strip when the words wrap.
+  */
+  .link-draw {
+    padding-bottom: 0.125rem;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1.5px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    transition: background-size 0.25s ease-out;
+  }
+
+  a:focus-visible .link-draw {
+    background-size: 100% 1.5px;
+  }
+
+  /* hover: hover leaves out touch screens, where a tap would leave the line behind. */
+  @media (hover: hover) {
+    a:hover .link-draw {
+      background-size: 100% 1.5px;
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.35s ease-out both;
+  }
+
+  /*
+    The same upward nudge without the fade, for the hero headline. Browsers time a page by
+    when its largest piece of content becomes visible (Largest Contentful Paint), and text
+    that starts fully transparent is not counted. The headline therefore stays opaque and
+    only slides, so it is on screen, and measured, from the first frame.
+  */
+  .animate-rise {
+    animation: rise 0.35s ease-out both;
+  }
+}
+
+@keyframes glow-drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(6%, 8%, 0) scale(1.15);
+  }
+}
+
+@keyframes backdrop-parallax {
+  to {
+    transform: translate3d(0, var(--parallax), 0);
+  }
+}
+
+@keyframes orb-float {
+  from {
+    transform: translateY(-0.375rem);
+  }
+  to {
+    transform: translateY(0.375rem);
+  }
+}
+
+@keyframes orb-pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-dot {
+  from {
+    transform: rotate(0deg) scaleY(calc(1 / var(--orbit-squash)));
+  }
+  to {
+    transform: rotate(-360deg) scaleY(calc(1 / var(--orbit-squash)));
+  }
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes ring-in {
+  from {
+    opacity: 0;
+    transform: rotate(-4deg) scale(0.9);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(12px);
+  }
+}
+
+/*
+  Theme switch: the toggle wraps the change in a View Transition. The browser snapshots the
+  page before and after, then crossfades between the two snapshots.
+*/
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-in-out;
+}
+
+/* Windows high-contrast mode replaces backgrounds, so gradient text needs a real colour. */
+@media (forced-colors: active) {
+  .text-gradient {
+    background-image: none;
+    color: CanvasText;
+  }
+}
+
+/*
+  Visitors who ask for less motion get a still page: no drifting glows, no orbiting dots,
+  no entrance animations and an instant theme switch.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-glow,
+  .orb,
+  .orb-glow,
+  .orbit-spin,
+  .orbit-dot,
+  .highlight-ring,
+  .animate-fade-up,
+  .animate-rise {
+    animation: none;
+  }
+
+  /* The underline of a text link appears at once instead of being drawn. */
+  .link-draw {
+    transition: none;
+  }
+
+  /* Nothing is typed under reduced motion, so there is no caret to show. */
+  .typed-caret {
+    display: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }

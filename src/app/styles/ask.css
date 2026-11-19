@@ -1,0 +1,39 @@
+/*
+  Styles for "Ask about Ashish", the question box above the Contact section
+  (sections/ask.tsx, ask-box.tsx). Imported by globals.css. Use the design tokens
+  (var(--accent), var(--border) and so on), never raw colours.
+*/
+
+@layer components {
+  /*
+    The place the question box is loaded into (ask-box-loader.tsx). It is given the
+    height of the box at rest (the field, the button and the ready-made questions),
+    so the card does not grow, and nothing below it moves, when the box arrives. A
+    phone stacks the button under the field and the questions one to a row.
+  */
+  .ask-holder {
+    min-height: 22rem;
+  }
+
+  @media (min-width: 40rem) {
+    .ask-holder {
+      min-height: 10.75rem;
+    }
+  }
+
+  /*
+    A block at the end of the answer while it is still arriving. It marks where the
+    text will continue; it does not blink or move, so there is nothing to switch off
+    for reduced motion.
+  */
+  .ask-cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: 1em;
+    margin-left: 0.125rem;
+    vertical-align: -0.15em;
+    border-radius: 1px;
+    background: var(--accent);
+    opacity: 0.8;
+  }
+}

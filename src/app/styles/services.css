@@ -1,0 +1,89 @@
+/*
+  Styles for the Services part of the homepage: the small line drawings on the service
+  cards (service-drawing.tsx). Imported by globals.css. Use the design tokens
+  (var(--accent), var(--border) and so on), never raw colours.
+
+  Each drawing is a few thin lines and one dot. The dot is drawn at one end, and --dx and
+  --dy, which the drawing sets on itself, say how far away the other end is. The dot makes
+  that trip on two occasions:
+
+    1. Once, when the card first scrolls into view. seen-list.tsx changes data-seen on the
+       card to "true", the dot's resting place becomes the far end, and the transition
+       below carries it there.
+    2. On every hover, where a mouse is in use: an animation runs the trip again from the
+       start, and the lines brighten.
+
+  A touch screen gets the first trip only. Either way the dot moves with transform alone
+  and is at rest within 350ms of setting off.
+*/
+
+@layer components {
+  .service-drawing {
+    flex-shrink: 0;
+    /* A dot at the very edge of a drawing would otherwise lose a sliver of itself. */
+    overflow: visible;
+  }
+
+  /* Drawn in the accent colour and thinned with opacity, so no colour has to be mixed. */
+  .service-lines {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-opacity: 0.45;
+    transition: stroke-opacity 0.2s ease-out;
+  }
+
+  .service-label {
+    fill: var(--muted-foreground);
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  /* The short wait lets the card finish fading in before the dot sets off. */
+  .service-dot {
+    fill: var(--accent);
+    transition: transform 0.35s ease-out 0.15s;
+  }
+
+  [data-seen="true"] .service-dot {
+    transform: translate(var(--dx), var(--dy));
+  }
+
+  /*
+    hover: hover is true where the main pointer can rest over things: a mouse or a
+    trackpad. Without it a phone would keep the hover look after every tap.
+  */
+  @media (hover: hover) {
+    .service-card:hover .service-lines {
+      stroke-opacity: 1;
+    }
+
+    .service-card:hover .service-dot {
+      animation: service-dot-travel 0.35s ease-out;
+    }
+  }
+}
+
+@keyframes service-dot-travel {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--dx), var(--dy));
+  }
+}
+
+/* Visitors who ask for less motion get the finished drawing: the dot at the far end. */
+@media (prefers-reduced-motion: reduce) {
+  .service-dot {
+    transform: translate(var(--dx), var(--dy));
+    transition: none;
+  }
+
+  .service-card:hover .service-dot {
+    animation: none;
+  }
+}

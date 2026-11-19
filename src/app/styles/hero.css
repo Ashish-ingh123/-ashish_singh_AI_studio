@@ -1,0 +1,124 @@
+/*
+  Styles for the hero at the top of the homepage. Imported by globals.css.
+  Use the design tokens (var(--accent), var(--border) and so on), never raw colours.
+*/
+
+@layer components {
+  /*
+    The headline grows with the screen: 36px on a 360px phone, 72px from about 1200px up.
+    clamp(low, ideal, high) picks the middle of its three values, and the ideal one
+    contains vw (1% of the screen width), so the size slides smoothly between the two
+    limits without a single breakpoint. The 10vw inside min() only matters below 360px:
+    it shrinks the headline to 32px on a 320px phone, so its second line still fits.
+
+    text-wrap: balance makes the browser break the headline into lines of similar length
+    ("Turns ideas into" over "working software") at every width, instead of filling the
+    first line and leaving one word on the second.
+  */
+  .hero-statement {
+    font-size: clamp(2rem, min(10vw, 1.2rem + 4.6vw), 4.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  /*
+    The field (hero-field.tsx) is a canvas stretched over the whole hero, behind its text.
+
+    A mask works like an alpha channel laid over the canvas: the drawing shows where the
+    gradient is opaque and fades where it is see-through. "black" is only the mask's word
+    for "fully visible"; nothing black is drawn on the page. Behind the text the field is
+    turned down to about a fifth, which keeps the words at their full contrast.
+
+    On narrow screens the field is at full strength in a strip above the text (BAND in
+    hero-field.tsx; the stops are in px because the canvas draws in px), faint behind the
+    text, and gone by the bottom edge, so the next section does not begin on a hard line.
+
+    The canvas starts see-through and fades in once its first frame is drawn. The
+    -webkit- lines are for Chrome and Edge before version 120, which only understand the
+    prefixed names.
+  */
+  .hero-field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease-out;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0,
+      black 100px,
+      rgb(0 0 0 / 0.24) 184px,
+      rgb(0 0 0 / 0.2) 82%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black 0,
+      black 100px,
+      rgb(0 0 0 / 0.24) 184px,
+      rgb(0 0 0 / 0.2) 82%,
+      transparent 100%
+    );
+  }
+
+  .hero-field.is-ready {
+    opacity: 1;
+  }
+
+  /*
+    From the lg breakpoint (64rem, WIDE in hero-field.tsx) the hero fills the first screen
+    under the header (4rem plus its 1px border), up to a sensible limit, with its text
+    centred from top to bottom. svh is 1% of the smallest height the screen can have, so a
+    browser bar that slides away does not make the hero jump.
+
+    The field now has the right-hand side to itself. Two masks are laid over each other and
+    only where both are opaque does the drawing show (intersect): one fades the field in
+    from left to right, the other fades it out at the bottom edge.
+  */
+  @media (min-width: 64rem) {
+    .hero {
+      display: grid;
+      align-items: center;
+      min-height: min(calc(100svh - 4rem - 1px), 51.25rem);
+    }
+
+    .hero-field {
+      -webkit-mask-image:
+        linear-gradient(
+          to right,
+          rgb(0 0 0 / 0.14) 0,
+          rgb(0 0 0 / 0.26) 34%,
+          black 64%
+        ),
+        linear-gradient(to bottom, black 84%, transparent 100%);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(
+          to right,
+          rgb(0 0 0 / 0.14) 0,
+          rgb(0 0 0 / 0.26) 34%,
+          black 64%
+        ),
+        linear-gradient(to bottom, black 84%, transparent 100%);
+      mask-composite: intersect;
+    }
+  }
+}
+
+/* Visitors who ask for less motion get the field's still frame at once, with no fade. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-field {
+    transition: none;
+  }
+}
+
+/* Windows high-contrast mode: the visitor chose their own colours, so drop the decoration. */
+@media (forced-colors: active) {
+  .hero-field {
+    display: none;
+  }
+}

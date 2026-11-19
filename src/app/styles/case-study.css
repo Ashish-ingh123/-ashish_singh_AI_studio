@@ -1,0 +1,58 @@
+/*
+  Styles for the case study pages. Imported by globals.css.
+  Use the design tokens (var(--accent), var(--border) and so on), never raw colours.
+
+  The architecture diagram draws itself the first time it scrolls into view
+  (architecture-diagram.tsx). seen-list.tsx marks the figure: data-armed="true" when it
+  is still off screen as the page loads, then data-seen="true" when it arrives. Every
+  layer and every arrow carries --i, its place in the order of drawing, and waits --i
+  times --step for its turn, so one rule draws the diagram from the inside out. Each
+  part takes 300ms; four layers are done in a little over a second.
+
+  Everything sits inside "no-preference", so visitors who ask for less motion get the
+  finished drawing. So does a visitor without script, and one who loads the page with
+  the diagram already on screen: nothing is hidden until the figure has been armed.
+*/
+
+@media (prefers-reduced-motion: no-preference) {
+  .arch {
+    --step: 0.25s;
+  }
+
+  .arch-layer {
+    transition:
+      opacity 0.3s ease-out,
+      transform 0.3s ease-out;
+    transition-delay: calc(var(--i) * var(--step));
+  }
+
+  /*
+    An arrow is given a length of exactly 1 (pathLength in the markup), so a dash of 1
+    is the whole line. Sliding the dash off by 1 hides the line; sliding it back draws
+    it from its start, at the outer layer, to the layer it points at. It sets off just
+    after its own layer has begun to appear.
+  */
+  .arch-arrow {
+    stroke-dasharray: 1;
+    transition:
+      stroke-dashoffset 0.3s ease-out,
+      opacity 0.15s ease-out;
+    transition-delay: calc(var(--i) * var(--step) + 0.1s);
+  }
+
+  .arch[data-armed="true"][data-seen="false"] .arch-layer {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .arch[data-armed="true"][data-seen="false"] .arch-arrow {
+    opacity: 0;
+    stroke-dashoffset: 1;
+  }
+
+  /* Hidden again in an instant, should it ever be needed: only the drawing is slow. */
+  .arch[data-seen="false"] .arch-layer,
+  .arch[data-seen="false"] .arch-arrow {
+    transition: none;
+  }
+}

@@ -1,0 +1,276 @@
+/*
+  Styles for the RAG pipeline, the lower half of the AI card in the Services section
+  (rag-pipeline.tsx). Imported by globals.css. Use the design tokens (var(--accent),
+  var(--border) and so on), never raw colours.
+
+  How the animation works. The list of stages carries data-state: "idle" at first, "play"
+  once pipeline-player.tsx sees it scroll into view. Each stage carries --i, its place in
+  the line (0, 1, 2...), and --slot is the time the pulse takes from one stage to the
+  next. Everything a stage animates is delayed by --i times --slot, so one rule serves
+  all five stages and they light up in order as the pulse reaches them. The whole pass
+  takes four slots plus the last stage's 0.3s: under five seconds, and it runs once.
+
+  What moves: the pulse and the line that fills behind it change transform and opacity
+  only. A stage lighting up is a 0.3s change of colours, a state change like a hover.
+*/
+
+@layer components {
+  /*
+    The line that names the stages, with Replay at the far end. On a narrow screen the
+    button drops under the line.
+  */
+  .pipeline-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  /*
+    Narrow screens: the stages are a column. Each stage is a small grid: the round node on
+    the left, the name and the sentence beside it, and a line running down from the node
+    to the next stage.
+  */
+  .pipeline-stages {
+    --gap: 1.5rem;
+    --slot: 1s;
+    display: grid;
+    gap: var(--gap);
+    margin-top: 1.5rem;
+  }
+
+  .pipeline-stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: 0.875rem;
+    align-content: start;
+  }
+
+  /* Dim until the pulse arrives. Only this circle is dim; the words never are. */
+  .pipeline-node {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    grid-row: 1 / span 2;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+
+  .pipeline-node svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .pipeline-name {
+    align-self: end;
+  }
+
+  .pipeline-text {
+    grid-column: 2;
+    margin-top: 0.25rem;
+  }
+
+  /*
+    The line from this node to the next: it starts a little under the node and ends a
+    little above the next one, which sits one gap below the end of this stage.
+
+    container-type makes the line a "container", so that its own length is available to
+    its children as a unit: 100cqh is the line's full height and 100cqw its full width.
+    That is how the pulse can travel exactly the length of the line with a transform,
+    whatever that length turns out to be on a given screen.
+  */
+  .pipeline-rail {
+    position: absolute;
+    top: 2.875rem;
+    left: 1.1875rem;
+    width: 2px;
+    height: calc(100% + var(--gap) - 3.25rem);
+    border-radius: 1px;
+    background: var(--border);
+    container-type: size;
+  }
+
+  /* The accent-coloured copy of the line, squashed to nothing until the pulse passes. */
+  .pipeline-rail-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 1px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+
+  .pipeline-pulse {
+    position: absolute;
+    top: -4px;
+    left: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background: var(--accent);
+    box-shadow: 0 0 10px 2px var(--glow);
+    opacity: 0;
+  }
+
+  /*
+    "both" holds the first keyframe during the delay and the last one afterwards, so a
+    stage waits dim for its turn and then stays lit.
+  */
+  .pipeline-stages[data-state="play"] .pipeline-node {
+    animation: pipeline-node-on 0.3s ease-out both;
+    animation-delay: calc(var(--i) * var(--slot));
+  }
+
+  .pipeline-stages[data-state="play"] .pipeline-rail-fill {
+    animation: pipeline-fill-down var(--slot) ease-in-out both;
+    animation-delay: calc(var(--i) * var(--slot));
+  }
+
+  .pipeline-stages[data-state="play"] .pipeline-pulse {
+    animation: pipeline-pulse-down var(--slot) ease-in-out both;
+    animation-delay: calc(var(--i) * var(--slot));
+  }
+
+  /*
+    From the lg breakpoint the stages are a row of five equal columns: the node on top,
+    the words under it, and the line running across to the next column's node.
+  */
+  @media (min-width: 64rem) {
+    .pipeline-stages {
+      --gap: 1.75rem;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-top: 1.75rem;
+    }
+
+    .pipeline-stage {
+      display: block;
+    }
+
+    .pipeline-node {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .pipeline-node svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .pipeline-name {
+      margin-top: 1rem;
+    }
+
+    .pipeline-text {
+      margin-top: 0.375rem;
+    }
+
+    .pipeline-rail {
+      top: calc(1.5rem - 1px);
+      left: 3.5rem;
+      width: calc(100% + var(--gap) - 4rem);
+      height: 2px;
+      container-type: inline-size;
+    }
+
+    .pipeline-rail-fill {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    .pipeline-pulse {
+      top: -3px;
+      left: -4px;
+    }
+
+    .pipeline-stages[data-state="play"] .pipeline-rail-fill {
+      animation-name: pipeline-fill-across;
+    }
+
+    .pipeline-stages[data-state="play"] .pipeline-pulse {
+      animation-name: pipeline-pulse-across;
+    }
+  }
+}
+
+@keyframes pipeline-node-on {
+  to {
+    border-color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 16%, var(--card));
+    color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 14%, transparent);
+  }
+}
+
+@keyframes pipeline-fill-down {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pipeline-fill-across {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The pulse fades in as it leaves a node and out as it reaches the next. */
+@keyframes pipeline-pulse-down {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100cqh);
+  }
+}
+
+@keyframes pipeline-pulse-across {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100cqw);
+  }
+}
+
+/*
+  Visitors who ask for less motion get the finished picture at once: every stage lit, the
+  lines filled, no pulse, and no Replay button, because there is nothing to replay.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-stages .pipeline-node {
+    border-color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 16%, var(--card));
+    color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 14%, transparent);
+    animation: none;
+  }
+
+  .pipeline-stages .pipeline-rail-fill {
+    transform: none;
+    animation: none;
+  }
+
+  .pipeline-stages .pipeline-pulse,
+  .pipeline-replay {
+    display: none;
+  }
+}

@@ -1,0 +1,66 @@
+/*
+  Cursor spotlight: a soft violet light that follows the pointer inside every glass card.
+  Imported by globals.css. Use the design tokens (var(--accent), var(--border) and so on),
+  never raw colours.
+
+  src/components/card-spotlight.tsx writes the pointer position onto the card under the
+  pointer as two CSS variables, --spot-x and --spot-y, in pixels from the card's top-left
+  corner. The rules below draw a radial gradient centred on that point in the card's
+  ::before pseudo-element, an extra box the browser adds inside the card without markup.
+
+  The light only moves when the visitor moves the pointer, so it stays on under reduced
+  motion, the same reasoning as the scroll progress bar.
+*/
+
+/*
+  These rules go in the components layer, beside .glass-card in globals.css. CSS written
+  outside every layer beats Tailwind's utility classes, so without the layer a card could
+  no longer be given a class such as "absolute" or "sticky".
+*/
+@layer components {
+  /*
+    relative makes the card the box the light is positioned against. isolate gives the
+    card its own stacking context (a private z-index scale), so the z-index of -1 below
+    means "behind this card's content", not "behind the whole page".
+  */
+  .glass-card {
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Only where the main pointer can hover and aim precisely: a mouse or a trackpad. */
+  @media (hover: hover) and (pointer: fine) {
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      /* Above the card's own background, below its text. */
+      z-index: -1;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
+      /*
+        Drawn in the full accent colour; the opacity on hover sets how strong it looks.
+        Thinning the colour here with color-mix() gives the same picture, but Tailwind
+        then adds a fallback for browsers without color-mix(): the solid accent colour,
+        which would hide the text. The 50% fallbacks keep the light in the middle of
+        the card until a position has been written.
+      */
+      background: radial-gradient(
+        18rem circle at var(--spot-x, 50%) var(--spot-y, 50%),
+        var(--accent),
+        transparent 65%
+      );
+    }
+
+    /*
+      The strength of the light: the accent colour at 12%. Any stronger and accent-coloured
+      text under the pointer drops below the 4.5:1 contrast that small text needs in the
+      dark theme.
+    */
+    .glass-card:hover::before {
+      opacity: 0.12;
+    }
+  }
+}

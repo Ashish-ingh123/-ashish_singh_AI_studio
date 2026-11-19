@@ -1,0 +1,81 @@
+/*
+  Styles for the projects part of the homepage. Imported by globals.css.
+  Use the design tokens (var(--accent), var(--border) and so on), never raw colours.
+*/
+
+@layer components {
+  /*
+    The glow behind a project's terminal window; project-visual.tsx sizes and places it.
+    The window is opaque and hides the middle of the gradient, so the colour holds at full
+    strength for the first 40% of the way out and only then fades. With a plain
+    centre-to-edge fade, like the orb's, hardly any light would be left past the window.
+    The glow stands still, so there is no animation to switch off for reduced motion.
+  */
+  .project-glow {
+    background: radial-gradient(
+      closest-side,
+      var(--orb-glow) 40%,
+      transparent
+    );
+  }
+
+  /*
+    The terminal window types its lines out (terminal-window.tsx). Letters that are still
+    to come, and the prompt marks of lines not yet reached, are in the page from the start
+    and only made invisible, so they keep their place and the text never shifts or wraps
+    differently while it fills in. Opacity, unlike visibility: hidden, also leaves them
+    there for screen readers.
+  */
+  .terminal-waiting {
+    opacity: 0;
+  }
+
+  /*
+    The cursor: a block one letter wide at the point where the next letter will appear.
+    It is taken out of the flow (position: absolute) and given no left or top, which
+    leaves it at the exact spot it would have had in the line, while it takes up no room
+    there. So it cannot push a word onto the next row, and nothing moves when it goes.
+    The top margin lowers it from the top of the line to the top of the letters.
+  */
+  .terminal-caret {
+    position: absolute;
+    width: 0.6em;
+    height: 1.2em;
+    margin-top: 0.2em;
+    border-radius: 1px;
+    background: var(--accent);
+    opacity: 0.8;
+  }
+
+  /*
+    The steering wheel beside the steering-angle project (steering-wheel.tsx). The
+    drawing's coordinates start at the wheel's centre, so the rotation the script writes
+    turns the wheel about its hub. Only transform changes, which the browser can animate
+    without repainting the page. The two marks are the accent colour: one fixed above
+    the wheel for "straight ahead", one on the rim that turns with it.
+  */
+  .steering-rotor {
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
+  .steering-mark {
+    fill: var(--accent);
+  }
+
+  .steering-rim-mark {
+    stroke: var(--accent);
+    stroke-width: 7;
+  }
+}
+
+/* On paper nothing is typed: a window that was still waiting prints its lines in full. */
+@media print {
+  .terminal-waiting {
+    opacity: 1;
+  }
+
+  .terminal-caret {
+    display: none;
+  }
+}
