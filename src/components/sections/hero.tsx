@@ -108,7 +108,7 @@ export function Hero() {
               />
             </ButtonLink>
             <ButtonLink
-              href="#projects"
+              href="#product"
               variant="secondary"
               className="min-h-11"
             >

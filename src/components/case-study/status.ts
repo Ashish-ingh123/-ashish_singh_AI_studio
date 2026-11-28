@@ -10,7 +10,8 @@ export const buildTone: Record<BuildStatus, BadgeTone> = {
 };
 
 export const releaseTone: Record<ReleaseStatus, BadgeTone> = {
-  "In progress": "accent",
+  Built: "accent",
+  "In progress": "accent-outline",
   Designed: "muted",
   Planned: "muted-outline",
 };

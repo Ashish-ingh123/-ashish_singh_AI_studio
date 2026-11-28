@@ -225,14 +225,16 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
 /**
  * The projects as "featured project" rows, after the reference design: the text on one
  * side, a picture on the other, the sides swapping from row to row, and the description
- * card reaching over the edge of the picture.
+ * card reaching over the edge of the picture. A project with onHome: false is left out
+ * (BillingRecon, which has its own sections); the rows alternate among those shown.
  */
 export function Projects() {
+  const shown = profile.projects.filter((project) => project.onHome !== false);
   return (
     <Section id="projects" space="roomy">
       {/* A flex column, not a grid: a grid column could be pushed wider by long content. */}
       <ul className="flex flex-col gap-20 lg:gap-28">
-        {profile.projects.map((project, index) => (
+        {shown.map((project, index) => (
           <li key={project.name}>
             <ProjectRow project={project} index={index} />
           </li>

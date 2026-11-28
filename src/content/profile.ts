@@ -13,6 +13,8 @@ export type Links = {
 
 /** The page sections, used both for header links and for the anchor ids on the page. */
 export type SectionId =
+  | "product"
+  | "features"
   | "about"
   | "services"
   | "experience"
@@ -470,7 +472,7 @@ export type CaseStudySection = {
 /** How far along one area of a project is. Never mark designed work as built. */
 export type BuildStatus = "Built" | "Partly built" | "Designed" | "Not started";
 
-export type ReleaseStatus = "In progress" | "Designed" | "Planned";
+export type ReleaseStatus = "Built" | "In progress" | "Designed" | "Planned";
 
 export type ArchitectureLayer = {
   name: string;
@@ -553,6 +555,68 @@ export type Project = {
     demo?: string;
   };
   caseStudy?: CaseStudy;
+  /**
+   * false keeps the project off the homepage's Projects section while its case study
+   * page stays. BillingRecon has its own sections on the homepage (product, features)
+   * since Step 4 of the Ashvanta site, 2026-11-28.
+   */
+  onHome?: boolean;
+};
+
+/**
+ * BillingRecon on the homepage: the product and features sections (Step 4 of the Ashvanta
+ * site, 2026-11-28). Every claim must be built, and say so, or say "Planned": the source
+ * is BILLINGRECON-FACTS.md beside the repository. "Built" means built and tested in
+ * development; no hospital uses it yet, and the site must not suggest one does.
+ */
+export type FeatureIcon =
+  | "patients"
+  | "catalogue"
+  | "bills"
+  | "payments"
+  | "approvals"
+  | "ledger"
+  | "reports"
+  | "printing"
+  | "shift"
+  | "export"
+  | "security"
+  | "import";
+
+export type FeatureStatus = "Built" | "Planned";
+
+export type ProductFeature = {
+  icon: FeatureIcon;
+  title: string;
+  text: string;
+  status: FeatureStatus;
+  /** A limit worth saying out loud, shown under the text, for example "not yet tried in Tally". */
+  note?: string;
+};
+
+export type Product = {
+  /** What BillingRecon is, in one sentence: the section's intro beside its heading. */
+  intro: string;
+  /** Who uses it, and who it does not serve yet. */
+  audience: string;
+  /** The heading over the promises. */
+  promiseHeading: string;
+  /** The financial-correctness rules in plain words, each built. */
+  promises: { title: string; text: string }[];
+  /** The honest status line: built and tested in development, not yet at a hospital. */
+  status: string;
+  /** What the second button says: the way to the features. */
+  featuresAction: string;
+  /** The features section's intro beside its heading. */
+  featuresIntro: string;
+  features: ProductFeature[];
+  /** The heading over the "how it works" steps. */
+  flowHeading: string;
+  /** The everyday flow of money through BillingRecon, in order. */
+  flow: { name: string; text: string }[];
+  /** The heading over the releases. */
+  releasesHeading: string;
+  releases: Release[];
 };
 
 export type Education = {
@@ -610,6 +674,8 @@ export type Profile = {
   /** Short status shown as a pill in the hero. */
   availability: string;
   hero: Hero;
+  /** BillingRecon's sections on the homepage. */
+  product: Product;
   /** The first sentence doubles as the search-result description, so keep it self-contained. */
   summary: string;
   /** One or two sentences for the hero, under the name and title. */
@@ -660,6 +726,45 @@ export type Profile = {
   achievements: string[];
 };
 
+/**
+ * BillingRecon's releases, shared by the homepage's features section (product.releases) and
+ * the case study's roadmap, so the two can never disagree. Release 1 is built; the rest are
+ * planned (BILLINGRECON-FACTS.md section 7).
+ */
+const billingReconReleases: Release[] = [
+  {
+    name: "Release 1",
+    scope:
+      "Hospitals, users and roles; patients and self-pay payers; the service catalogue; bills, credit notes, payments with allocation, reversals, refunds and adjustments; the double-entry ledger with its reconciliation; the audit trail; reports, the dashboard and the screens for all of it.",
+    status: "Built",
+    note: "Tagged v1.0.0 on 24 November 2026. Built since: the redesigned screens, printing on letterhead, import and onboarding, cashier shifts and day-end, two-step sign-in, the Tally export, nightly reconciliation alerts and tables to filter and sort.",
+  },
+  {
+    name: "R2 · Reconciliation",
+    scope:
+      "Bank and payment-gateway statements imported and matched to payments, with suspense cash and reconciliation reports.",
+    status: "Planned",
+  },
+  {
+    name: "R3 · Recovery",
+    scope:
+      "The ageing of dues, reminders, promises to pay, disputes, and write-offs under approval.",
+    status: "Planned",
+  },
+  {
+    name: "R4 · Insurance and corporate",
+    scope:
+      "Insurers, TPAs and corporate accounts: claims, pre-authorisation, split billing, payer pricing and credit limits.",
+    status: "Planned",
+  },
+  {
+    name: "R5 · Maturity",
+    scope:
+      "Period close, hardening, metrics and tracing, backup and recovery drills, and GST and compliance reporting.",
+    status: "Planned",
+  },
+];
+
 export const profile: Profile = {
   name: "Ashish Singh",
   title: "Software Engineer",
@@ -707,12 +812,136 @@ export const profile: Profile = {
     ],
     fieldQueryLabel: "query",
   },
+  product: {
+    intro:
+      "BillingRecon is billing, payments and receivables software for hospitals and clinics in India.",
+    audience:
+      "It is made for a hospital's billing clerks, cashiers, supervisors and administrators, and for read-only viewers such as auditors. Today every payer is the patient or a guarantor; insurers, TPAs and corporate accounts come in release 4.",
+    promiseHeading: "The money is always right",
+    promises: [
+      {
+        title: "Exact rupees and paise",
+        text: "Amounts are exact decimals, rounded once per line, never floating point.",
+      },
+      {
+        title: "Nothing posted is changed",
+        text: "A posted bill or payment is never edited or deleted; a mistake is put right by a new document.",
+      },
+      {
+        title: "A double-entry ledger",
+        text: "Every rupee is recorded twice, in the same step as its document, and the balances are checked against it every night.",
+      },
+      {
+        title: "A second person approves",
+        text: "Refunds, adjustments, credit notes and large bills take effect only when someone other than their author approves.",
+      },
+      {
+        title: "No gaps in the numbers",
+        text: "Bill, payment and refund numbers run without gaps for each hospital and financial year.",
+      },
+      {
+        title: "Each hospital apart",
+        text: "One installation serves many hospitals, and no hospital ever sees another's data.",
+      },
+    ],
+    status: "Built and tested in development; not yet in use at a hospital.",
+    featuresAction: "See the features",
+    featuresIntro:
+      "Twelve parts, all built and tested in development. Each card says what it does today.",
+    features: [
+      {
+        icon: "patients",
+        title: "Patients and payers",
+        text: "Register patients with an MRN and set up who pays: the patient or a guarantor. People are deactivated, never deleted.",
+        status: "Built",
+      },
+      {
+        icon: "catalogue",
+        title: "Service catalogue",
+        text: "A price list of services with their tax rate, picked straight into a bill.",
+        status: "Built",
+      },
+      {
+        icon: "bills",
+        title: "Bills and credit notes",
+        text: "Draft a bill from the catalogue or free-text lines, post it with its number, and reduce a posted bill only by an approved credit note.",
+        status: "Built",
+      },
+      {
+        icon: "payments",
+        title: "Payments and allocation",
+        text: "Cash, card, UPI, bank transfer or cheque, applied to bills oldest first; money not yet applied is kept and reported.",
+        status: "Built",
+      },
+      {
+        icon: "approvals",
+        title: "Refunds, reversals and adjustments",
+        text: "Refunds, a bounced cheque's reversal, discounts, write-offs and rounding, each taking effect only after a second person approves.",
+        status: "Built",
+      },
+      {
+        icon: "ledger",
+        title: "Receivables ledger",
+        text: "Every posting goes into a double-entry ledger in the same step, and each night a reconciliation checks every hospital's balances against it.",
+        status: "Built",
+      },
+      {
+        icon: "reports",
+        title: "Dashboard and reports",
+        text: "Headline figures, billing against collections, the ageing of dues, and registers to filter, sort and export to CSV.",
+        status: "Built",
+      },
+      {
+        icon: "printing",
+        title: "Printing on letterhead",
+        text: "Bills, receipts and refund vouchers with the hospital's logo and signature, on A4, A5 or an 80 mm roll; a later copy says Duplicate.",
+        status: "Built",
+      },
+      {
+        icon: "shift",
+        title: "Cashier shift and day-end",
+        text: "Open a shift with a float, close it with a count of the cash; a difference needs another person's approval. Day-end report and closing slip.",
+        status: "Built",
+      },
+      {
+        icon: "export",
+        title: "Accountant's export for Tally",
+        text: "One balanced voucher per ledger posting in Tally's XML format, with the ledger names set for each hospital.",
+        status: "Built",
+        note: "Not yet tried in Tally itself.",
+      },
+      {
+        icon: "security",
+        title: "Users, roles and two-step sign-in",
+        text: "Five roles with their own permissions, a code from an authenticator app for administrators and supervisors, and sign-out that ends every session.",
+        status: "Built",
+      },
+      {
+        icon: "import",
+        title: "Import and onboarding",
+        text: "Bring in patients, guarantors and opening balances from an old system, each batch approved by a second person.",
+        status: "Built",
+        note: "So far tried on a sample hospital's data only.",
+      },
+    ],
+    flowHeading: "How it works",
+    flow: [
+      { name: "Bill", text: "Drafted from the catalogue" },
+      { name: "Post", text: "Its number and its ledger lines" },
+      { name: "Payment", text: "Cash, card, UPI or cheque" },
+      { name: "Allocate", text: "To the bills, oldest first" },
+      { name: "Receipt", text: "Printed on the letterhead" },
+      { name: "Nightly check", text: "Balances against the ledger" },
+    ],
+    releasesHeading: "Releases",
+    releases: billingReconReleases,
+  },
   summary:
     "Software Engineer building production software across the stack with C#, .NET, SQL Server, AngularJS and React, with experience in Docker, Redis and AWS. In my current role I develop and maintain a large healthcare ERP: billing workflows, payment and fiscal e-invoicing integrations, WhatsApp messaging, scheduled reporting and production debugging. I am also available for projects, from full-stack web apps and APIs to containerised microservices, cloud deployments on AWS, and AI features built on retrieval-augmented generation (RAG) and LLMs.",
   pitch:
     "I build software end to end: web apps, APIs, third-party integrations, containerised microservices and AI features powered by RAG and LLMs. If you have something to build, I can help.",
   currentlyBuilding:
-    "Currently building BillingRecon, a multi-tenant receivables service on .NET 10, ASP.NET Core and EF Core.",
+    "Building BillingRecon, billing and receivables software for hospitals and clinics in India: release 1 is built; release 2, bank reconciliation, is planned.",
   servicesIntro:
     "Have an idea, or a problem in software you already run? This is the kind of work I take on, from a single feature to a complete product.",
   contactNote:
@@ -725,15 +954,17 @@ export const profile: Profile = {
     github: "https://github.com/Ashish-singh123",
   },
   nav: [
+    { id: "product", label: "BillingRecon" },
+    { id: "features", label: "Features", heading: "What BillingRecon does" },
     { id: "about", label: "About" },
     { id: "services", label: "Services", heading: "What I can build" },
     { id: "experience", label: "Experience" },
     { id: "skills", label: "Skills" },
-    { id: "projects", label: "BillingRecon", heading: "Projects" },
+    { id: "projects", label: "Projects" },
     { id: "education", label: "Education", heading: "Education & Certifications" },
     { id: "contact", label: "Contact" },
   ],
-  menu: ["projects", "services", "about", "contact"],
+  menu: ["product", "features", "services", "about", "contact"],
   labels: {
     about: {
       role: "Role",
@@ -772,7 +1003,7 @@ export const profile: Profile = {
     },
     footer: {
       nav: "Footer",
-      links: ["projects", "contact"],
+      links: ["product", "contact"],
     },
     palette: {
       open: "Search",
@@ -1130,16 +1361,19 @@ export const profile: Profile = {
   projects: [
     {
       name: "BillingRecon",
-      tagline: "Billing Reconciliation & Dues Recovery Service",
+      tagline: "Billing, payments and receivables for hospitals in India",
       status: "In progress",
       slug: "billingrecon",
+      // BillingRecon has its own sections on the homepage (product, features); this entry
+      // feeds its case study page and the Ask box.
+      onHome: false,
       visual: {
-        title: "dotnet test",
+        title: "billingrecon",
         lines: [
-          "Api → Infrastructure → Application → Domain",
-          "Architecture tests: layer rules enforced",
-          "Tenant filter, write guard, audit stamps: covered",
-          "493 tests passed",
+          "Release 1: v1.0.0, 24 November 2026",
+          "Ledger: double-entry, checked every night",
+          "Refunds and adjustments: maker-checker",
+          "Built and tested in development",
         ],
       },
       tech: [
@@ -1147,38 +1381,41 @@ export const profile: Profile = {
         "ASP.NET Core",
         "EF Core",
         "SQL Server",
+        "React",
+        "TypeScript",
         "xUnit",
-        "Serilog",
-        "Clean Architecture",
+        "Playwright",
+        "Docker",
         "Multi-tenant",
       ],
       description:
-        "A multi-tenant receivables service for small clinics, diagnostic labs and nursing homes. It is designed to record every financial event immutably, keep balances provably correct, reconcile against bank and gateway statements, and drive recovery of dues. Built as a Clean Architecture modular monolith with four projects (Domain, Application, Infrastructure, Api); module boundaries are folders and namespaces enforced by architecture tests.",
+        "Billing, payments and receivables software for hospitals and clinics in India: bills, credit notes, payments, refunds and adjustments under maker-checker, a double-entry receivables ledger checked every night, reports, printing on letterhead and an export for Tally. Built and tested in development; not yet in use at a hospital.",
       highlights: [
-        "Layered architecture (Domain, Application, Infrastructure, Api) with the dependency rules enforced by automated architecture tests.",
-        "RFC 9457 problem-details error contract with typed error codes and a global exception handler.",
-        "Correlation-ID middleware so every log line and error response can be traced back to one request.",
-        "Structured JSON logging with Serilog and Seq, with PII masking so patient data never reaches the logs.",
-        "Tenant isolation in EF Core: global query filter, a write-guard interceptor and audit stamping, all covered by tests.",
-        "Startup-validated configuration, health endpoints and OpenAPI docs with Scalar in Development.",
-        "493 passing automated tests, none of which needs Docker or a database.",
+        "Bills and credit notes with gapless numbers per hospital and financial year, and payments by cash, card, UPI, bank transfer or cheque, allocated to bills oldest first.",
+        "Refunds, reversals and adjustments that take effect only after a second, different person approves.",
+        "A double-entry receivables ledger written in the same step as each document, with a reconciliation of every hospital's balances each night.",
+        "An append-only audit trail, and no hard deletes of financial records.",
+        "Dashboard and reports with CSV export, and lists and reports to filter, sort and choose columns.",
+        "Printing of bills, receipts and refund vouchers on the hospital's letterhead, on A4, A5 or an 80 mm roll.",
+        "Cashier shifts with a day-end report, two-step sign-in for administrators and supervisors, and an accountant's export in Tally's XML format (not yet tried in Tally itself).",
+        "A React and TypeScript front end in light and dark themes, checked with Playwright and axe for accessibility.",
       ],
       planned: [
-        "Billing: bills, line items and the bill state machine (Draft, Finalized, PartiallyPaid, Paid, Void).",
-        "Payments and allocation, including overpayments held as on-account credit.",
-        "Append-only receivables ledger with cached balances that are verified against the ledger.",
-        "Later releases: reconciliation against bank statements, dues recovery, insurance and corporate billing, and a React + TypeScript frontend.",
+        "Release 2: bank and payment-gateway statements imported and matched to payments.",
+        "Release 3: recovery of dues, with reminders, promises to pay and disputes.",
+        "Release 4: insurers, TPAs and corporate accounts, with claims and split billing.",
+        "Release 5: period close, metrics and tracing, recovery drills, and GST and compliance reporting.",
       ],
       caseStudy: {
         intro:
-          "BillingRecon is a side project where I apply ASP.NET Core, EF Core and Clean Architecture to a problem with real rules: a receivables service for small clinics, diagnostic labs and nursing homes. It is designed to be the single source of truth for what patients, insurers and corporates owe.",
+          "BillingRecon is billing, payments and receivables software for hospitals and clinics in India, built by Ashvanta Technologies on ASP.NET Core, EF Core and SQL Server with a React front end. It is the single source of truth for what each patient and guarantor owes.",
         statusSummary:
-          "Honest status: the engineering foundation is built and covered by 493 automated tests. Every business feature, from bills to reconciliation, is designed and documented but not built yet.",
+          "Honest status: release 1 and the work after it are built and tested in development; BillingRecon is not yet in use at a hospital. Bank reconciliation, recovery, and insurance and corporate billing are planned.",
         problem: {
           heading: "The problem",
           paragraphs: [
             "Small clinics, labs and nursing homes bill patients, insurers and corporates, and collect partial or lump-sum payments through cash, card, UPI, cheque, bank transfer and insurer settlements. Over time the balances drift, and money is lost to unallocated payments, untracked dues, duplicate entries and follow-ups that never happen.",
-            "The service is designed to record every financial event immutably, keep balances provably correct, reconcile them against bank and gateway statements, and drive the recovery of dues.",
+            "BillingRecon records every financial event immutably and keeps balances provably correct today; reconciling them against bank and gateway statements, and driving the recovery of dues, are its next releases.",
           ],
         },
         architecture: {
@@ -1211,153 +1448,102 @@ export const profile: Profile = {
         principles: [
           {
             name: "Decimal money",
-            status: "Designed",
+            status: "Built",
             summary:
-              "Amounts are decimal, never float: decimal(18,2) for amounts, (19,4) for unit prices and (9,3) for quantities. Rounding happens once, at line level and away from zero, and a bill-level round-off is a visible adjustment line, so paise never disappear silently.",
+              "Amounts are exact decimals, never floating point. Rounding happens once, at line level, and a total is the sum of the rounded lines, so paise never disappear silently.",
           },
           {
             name: "Immutable records",
-            status: "Designed",
+            status: "Built",
             summary:
               "Posted financial records are never updated or deleted. A correction is a new record, such as a reversal, a credit note or an adjustment, and each one writes its own ledger entry in the same database transaction.",
           },
           {
             name: "Idempotency",
-            status: "Designed",
+            status: "Built",
             summary:
               "Every request that moves money carries an Idempotency-Key. A replayed request returns the stored response instead of creating a second payment, which is what makes retries safe.",
           },
           {
             name: "Concurrency control",
-            status: "Partly built",
+            status: "Built",
             summary:
-              "Every table carries a row version. The API returns it as an ETag and requires If-Match on updates, so two people editing the same bill get a 409 Conflict instead of a silent lost update. The column convention exists; the ETag handling is designed.",
+              "Every table carries a row version. The API returns it as an ETag and requires If-Match on updates, so two people editing the same bill get a 409 Conflict instead of a silent lost update.",
           },
           {
             name: "Gapless numbering",
-            status: "Designed",
+            status: "Built",
             summary:
-              "Bill and receipt numbers come from a per-tenant number series that hands out consecutive numbers under a lock, so printed documents form an unbroken, auditable sequence.",
+              "Bill, payment, credit note, adjustment and refund numbers come from a number series per hospital, document type and Indian financial year, with no gaps: a failed posting gives its number back.",
           },
           {
             name: "Maker-checker",
-            status: "Designed",
+            status: "Built",
             summary:
-              "Write-offs, refunds and adjustments above a threshold need a second person to approve them, and the approver can never be the requester.",
+              "Reversals, adjustments, credit notes, refunds and bills above a hospital's threshold take effect only when a second person approves them, and neither the requester nor the document's author can approve.",
           },
         ],
         statusTable: [
           {
-            area: "Solution layout, central package management, analyzers, banned APIs",
+            area: "Engineering foundation: layout, architecture tests, logging with PII masking, error contract, tenant isolation",
             status: "Built",
           },
-          {
-            area: "Architecture tests for layer and module rules",
-            status: "Built",
-          },
-          {
-            area: "Domain primitives (Result, Error, typed ids, Entity, AggregateRoot) and the Tenant aggregate",
-            status: "Built",
-          },
-          { area: "Configuration validated at startup", status: "Built" },
-          {
-            area: "Structured logging with Serilog and Seq, PII masking, correlation ids",
-            status: "Built",
-          },
-          {
-            area: "Error contract: RFC 9457 problem details, error codes, global exception handler",
-            status: "Built",
-          },
-          { area: "OpenAPI with Scalar in Development", status: "Built" },
-          {
-            area: "EF Core conventions (typed ids, row version, audit columns, tenant filter), tenant write guard, audit stamping",
-            status: "Built",
-            note: "Verified against the model and generated SQL, not yet against a live SQL Server",
-          },
-          {
-            area: "Health endpoints",
-            status: "Partly built",
-            note: "The unhealthy path is tested; the healthy path needs SQL Server",
-          },
-          {
-            area: "First migration (tenants) and database startup",
-            status: "Partly built",
-            note: "Matches the model; never applied to a real SQL Server in the audited copy",
-          },
-          {
-            area: "Docker Compose with SQL Server 2022 and Seq",
-            status: "Designed",
-            note: "The file exists but has not been run",
-          },
-          { area: "Users, roles and JWT authentication", status: "Designed" },
-          { area: "Patients and payers", status: "Designed" },
-          { area: "Bills, line items, credit notes", status: "Designed" },
-          { area: "Payments, allocation, refunds", status: "Designed" },
+          { area: "Users, roles and JWT authentication", status: "Built" },
+          { area: "Patients, payers and the service catalogue", status: "Built" },
+          { area: "Bills, line items, credit notes", status: "Built" },
+          { area: "Payments, allocation, reversals, refunds", status: "Built" },
           {
             area: "Receivables ledger and cached, verifiable balances",
-            status: "Designed",
+            status: "Built",
           },
           {
             area: "Adjustments and maker-checker approvals",
-            status: "Designed",
+            status: "Built",
           },
           {
             area: "Idempotency keys, ETag concurrency, gapless number series",
-            status: "Designed",
-            note: "The row version column already exists",
+            status: "Built",
           },
           {
-            area: "Aging, outstanding and collection reports",
-            status: "Designed",
+            area: "Reports, dashboard and CSV export",
+            status: "Built",
           },
           {
-            area: "Reconciliation, dues recovery, insurance and corporate billing",
-            status: "Designed",
-            note: "Outline only, for later releases",
+            area: "React front end, light and dark themes, accessibility checks",
+            status: "Built",
           },
           {
-            area: "Integration tests with Testcontainers, CI workflow, React frontend",
+            area: "Printing on letterhead, import and onboarding, cashier shifts and day-end",
+            status: "Built",
+          },
+          {
+            area: "Two-step sign-in, accountant's export for Tally, nightly reconciliation alerts",
+            status: "Built",
+            note: "The Tally file has not yet been tried in Tally itself",
+          },
+          {
+            area: "Docker Compose for the whole stack, integration tests on SQL Server 2022",
+            status: "Built",
+            note: "Run on SQL Server 2022 on 24 November 2026; later database tests ran on LocalDB",
+          },
+          {
+            area: "CI workflow and production deployment files",
+            status: "Partly built",
+            note: "The files exist; neither has run yet",
+          },
+          {
+            area: "Bank reconciliation, dues recovery, insurance and corporate billing",
             status: "Not started",
+            note: "Releases 2 to 4",
           },
         ],
-        roadmap: [
-          {
-            name: "R1 · MVP",
-            scope:
-              "Tenants, users and roles, patients, payers, bills and line items, payments with manual and automatic allocation, credit notes, adjustments and refunds with approval, receivables ledger, audit trail, aging and collection reports, a minimal React UI, Docker and CI.",
-            status: "In progress",
-            note: "Phases 0 and 1, the foundation, are done. The business features start with payers, patients and bills.",
-          },
-          {
-            name: "R2 · Reconciliation",
-            scope:
-              "Internal integrity checks of cached balances against the ledger, bank, UPI and gateway statement import, a matching engine and a discrepancy workflow.",
-            status: "Designed",
-          },
-          {
-            name: "R3 · Dues recovery",
-            scope:
-              "Recovery cases, prioritisation, follow-up actions, promise-to-pay, reminders through a notification abstraction and scheduled jobs.",
-            status: "Designed",
-          },
-          {
-            name: "R4 · Insurance and corporate",
-            scope:
-              "Split billing between patient and payer, claim tracking from claimed to settled, TDS and disallowance handling, corporate credit limits and consolidated statements.",
-            status: "Designed",
-          },
-          {
-            name: "R5 · Production maturity",
-            scope:
-              "OpenTelemetry, load testing, performance tuning, backup and restore drills and final documentation.",
-            status: "Planned",
-          },
-        ],
+        roadmap: billingReconReleases,
         sections: [
           {
             heading: "Testing approach",
             paragraphs: [
-              "Unit tests use xUnit with Shouldly, architecture tests guard the layer boundaries, and the EF Core model and generated SQL are checked without a database. Integration tests against a real SQL Server in Docker are planned for the next phases; the EF in-memory provider is deliberately avoided because it does not enforce constraints or transactions.",
+              "Unit tests use xUnit with Shouldly, architecture tests guard the layer boundaries, integration tests run against SQL Server 2022 in Docker through Testcontainers, and browser tests use Playwright with axe accessibility checks. The EF in-memory provider is deliberately avoided because it does not enforce constraints or transactions.",
+              "On 24 November 2026 the backend ran on .NET 10 and SQL Server 2022: 1,277 of 1,280 integration tests passed, and the three timing tests that failed were fixed afterwards. The database tests of later work have so far run on LocalDB, and the CI workflow has not yet run on GitHub.",
             ],
           },
         ],
@@ -1407,6 +1593,6 @@ export const profile: Profile = {
     "Integrated fiscal e-invoicing into the billing flow of a production healthcare ERP, with safeguards against duplicate submissions on retry.",
     "Built a self-service OPD kiosk flow with WhatsApp OTP login and Pine Labs card-terminal payments.",
     "Built a configurable WhatsApp notification engine on event-driven queue tables for operational alerts and reports.",
-    "Laid the foundation of BillingRecon with 493 passing automated tests.",
+    "Built release 1 of BillingRecon: billing, payments, refunds and a double-entry receivables ledger for hospitals.",
   ],
 };
