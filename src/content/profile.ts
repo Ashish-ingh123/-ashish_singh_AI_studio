@@ -900,7 +900,7 @@ const billingReconReleases: Release[] = [
   {
     name: "R3 · Recovery",
     scope:
-      "The ageing of dues, reminders, promises to pay, disputes, and write-offs under approval.",
+      "Ageing buckets for recovery, reminders, promises to pay, disputes, and write-offs under approval.",
     status: "Planned",
   },
   {
@@ -981,7 +981,7 @@ export const profile: Profile = {
       },
       {
         title: "A double-entry ledger",
-        text: "Every rupee is recorded twice, in the same step as its document, and the balances are checked against it every night.",
+        text: "Every rupee is recorded twice, in the same step as its document, and a nightly reconciliation that checks the balances against it is built in.",
       },
       {
         title: "A second person approves",
@@ -1034,7 +1034,7 @@ export const profile: Profile = {
       {
         icon: "ledger",
         title: "Receivables ledger",
-        text: "Every posting goes into a double-entry ledger in the same step, and each night a reconciliation checks every hospital's balances against it.",
+        text: "Every posting goes into a double-entry ledger in the same step, and a nightly reconciliation of every hospital's balances against it is built in.",
         status: "Built",
       },
       {
@@ -1679,7 +1679,7 @@ export const profile: Profile = {
         title: "billingrecon",
         lines: [
           "Release 1: v1.0.0, 24 November 2026",
-          "Ledger: double-entry, checked every night",
+          "Ledger: double-entry, reconciled nightly",
           "Refunds and adjustments: maker-checker",
           "Built and tested in development",
         ],
@@ -1697,11 +1697,11 @@ export const profile: Profile = {
         "Multi-tenant",
       ],
       description:
-        "Billing, payments and receivables software for hospitals and clinics in India: bills, credit notes, payments, refunds and adjustments under maker-checker, a double-entry receivables ledger checked every night, reports, printing on letterhead and an export for Tally. Built and tested in development; not yet in use at a hospital.",
+        "Billing, payments and receivables software for hospitals and clinics in India: bills, credit notes, payments, refunds and adjustments under maker-checker, a double-entry receivables ledger with a nightly reconciliation built in, reports, printing on letterhead and an export for Tally. Built and tested in development; not yet in use at a hospital.",
       highlights: [
         "Bills and credit notes with gapless numbers per hospital and financial year, and payments by cash, card, UPI, bank transfer or cheque, allocated to bills oldest first.",
         "Refunds, reversals and adjustments that take effect only after a second, different person approves.",
-        "A double-entry receivables ledger written in the same step as each document, with a reconciliation of every hospital's balances each night.",
+        "A double-entry receivables ledger written in the same step as each document, with a nightly reconciliation of every hospital's balances built in.",
         "An append-only audit trail, and no hard deletes of financial records.",
         "Dashboard and reports with CSV export, and lists and reports to filter, sort and choose columns.",
         "Printing of bills, receipts and refund vouchers on the hospital's letterhead, on A4, A5 or an 80 mm roll.",
@@ -1716,14 +1716,14 @@ export const profile: Profile = {
       ],
       caseStudy: {
         intro:
-          "BillingRecon is billing, payments and receivables software for hospitals and clinics in India, built by Ashvanta Technologies on ASP.NET Core, EF Core and SQL Server with a React front end. It is the single source of truth for what each patient and guarantor owes.",
+          "BillingRecon is billing, payments and receivables software for hospitals and clinics in India, built by Ashvanta Technologies on ASP.NET Core, EF Core and SQL Server with a React front end. It is designed to be the single source of truth for what each patient and guarantor owes.",
         statusSummary:
           "Honest status: release 1 and the work after it are built and tested in development; BillingRecon is not yet in use at a hospital. Bank reconciliation, recovery, and insurance and corporate billing are planned.",
         problem: {
           heading: "Overview and the problem it solves",
           paragraphs: [
-            "Small clinics, labs and nursing homes bill patients, insurers and corporates, and collect partial or lump-sum payments through cash, card, UPI, cheque, bank transfer and insurer settlements. Over time the balances drift, and money is lost to unallocated payments, untracked dues, duplicate entries and follow-ups that never happen.",
-            "BillingRecon records every financial event immutably and keeps balances provably correct today; reconciling them against bank and gateway statements, and driving the recovery of dues, are its next releases.",
+            "Small clinics, labs and nursing homes bill patients, insurers and corporates, and collect partial or lump-sum payments through cash, card, UPI, cheque, bank transfer and insurer settlements. Over time the balances drift, and money is lost to unallocated payments, untracked dues, duplicate entries and follow-ups that never happen. Release 1 of BillingRecon handles self-pay payers, the patient or a guarantor; insurers and corporates come in release 4.",
+            "BillingRecon records every financial event immutably and keeps balances checked against the ledger, with any difference reported, today; reconciling them against bank and gateway statements, and driving the recovery of dues, are its next releases.",
             "BillingRecon is made for a hospital's billing clerks, cashiers, supervisors and administrators, and for read-only viewers such as auditors. Today every payer is the patient or a guarantor; insurers, TPAs and corporate accounts come in release 4.",
           ],
         },
@@ -1788,7 +1788,7 @@ export const profile: Profile = {
               workflow: [
                 { name: "Post", text: "Debits equal credits" },
                 { name: "Keep", text: "Balances beside the ledger" },
-                { name: "Reconcile", text: "Every hospital, every night" },
+                { name: "Reconcile", text: "Every hospital, a nightly job" },
               ],
             },
             {
@@ -1832,7 +1832,7 @@ export const profile: Profile = {
                 { name: "Choose", text: "Up to 92 days" },
                 { name: "Download", text: "Tally XML" },
               ],
-              note: "The format was checked against Tally's documentation; the file has not yet been tried in Tally itself.",
+              note: "The format was checked in part against Tally's documentation; the file has not yet been tried in Tally itself.",
             },
             {
               title: "Users, roles and two-step sign-in",
@@ -1859,7 +1859,7 @@ export const profile: Profile = {
         correctness: {
           heading: "Financial correctness",
           intro:
-            "The rules every part of BillingRecon follows, in plain words. All of them are built and covered by tests.",
+            "The rules every part of BillingRecon follows, in plain words. All of them are built into the code and tested.",
           rules: [
             {
               title: "Money is exact",
@@ -1979,7 +1979,7 @@ export const profile: Profile = {
           heading: "Operations",
           bullets: [
             "Onboarding: the operator adds, suspends or resumes a hospital with a command; patients, guarantors and opening balances come in by import, with a dry run and a second person's approval.",
-            "Every night at 02:00 India time a reconciliation checks every hospital, and one alert mail names any hospital whose balances drifted; no alert has yet reached a real mailbox.",
+            "A reconciliation of every hospital is built to run every night at 02:00 India time, with one alert mail naming any hospital whose balances drifted; it has not yet run on a server, and no alert has yet reached a real mailbox.",
             "A daily job removes expired retry keys.",
             "A watchdog script checks health, errors, disks, the transaction log, the last backup and the certificate, and mails once a day per problem; it has not yet run on a server.",
             "Backup scripts (a full backup with a checksum, and a restore under another name) ran on Docker on 24 November 2026. The production design, one Linux server with an encrypted database, nightly full and 15-minute log backups and a monthly restore drill, is written as files and has not run yet.",
@@ -2009,7 +2009,7 @@ export const profile: Profile = {
         stack: {
           heading: "Technology",
           bullets: [
-            ".NET 10 and ASP.NET Core: one API under /api/v1, errors as RFC 9457 problem details, OpenAPI.",
+            ".NET 10 and ASP.NET Core: one API under /api/v1, errors as RFC 9457 problem details, OpenAPI in development.",
             "EF Core 10 on SQL Server (2022 in Docker for tests and deployment); FluentValidation; Serilog to Seq, with phone numbers and e-mail addresses masked.",
             "React 19 and TypeScript with Vite, React Router, TanStack Query and Table, React Hook Form and Recharts; its own components on design tokens, in light and dark themes.",
             "xUnit, Shouldly, Testcontainers, NetArchTest and Bogus; Vitest and React Testing Library; Playwright with axe for the browser.",
@@ -2025,7 +2025,7 @@ export const profile: Profile = {
           rows: [
             {
               when: "24 Nov 2026",
-              what: "Domain 652, Application 431 and Architecture 132 tests passed; 1,277 of 1,280 integration tests passed on SQL Server 2022. The three timing tests that failed were fixed afterwards.",
+              what: "Domain 652, Application 431 and Architecture 132 tests passed; 1,277 of 1,280 integration tests passed on SQL Server 2022. The three timing tests that failed were fixed afterwards; the fix has not yet been confirmed in a full run.",
               how: "Personal machine, .NET 10, SQL Server 2022 in Docker",
             },
             {
@@ -2094,7 +2094,7 @@ export const profile: Profile = {
               contents: ["Controllers, middleware", "Composition root"],
             },
           ],
-          rule: "Each layer references only the layer inside it: Api references Infrastructure, Infrastructure references Application, Application references Domain, and Domain references nothing. Architecture tests fail the test run when any arrow is violated.",
+          rule: "Each layer references only layers inside it, never one outside: Api references Infrastructure and Application, Infrastructure references Application and Domain, Application references Domain, and Domain references nothing. Architecture tests fail the test run when any of these rules is broken.",
           points: [
             "A modular monolith with Clean Architecture layers in four projects: Domain, Application, Infrastructure and Api. Module boundaries are folders and namespaces, and automated architecture tests enforce them.",
             "Multi-tenant from the first table: every row belongs to one tenant, reads go through a global query filter, saves pass a tenant write guard, and every change is audit-stamped.",
@@ -2148,7 +2148,7 @@ export const profile: Profile = {
           {
             area: "CI workflow and production deployment files",
             status: "Partly built",
-            note: "The files exist; neither has run yet",
+            note: "The files exist; no CI run is recorded here, and the deployment has not run",
           },
           {
             area: "Bank reconciliation, dues recovery, insurance and corporate billing",
