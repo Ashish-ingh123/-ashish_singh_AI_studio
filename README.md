@@ -84,16 +84,20 @@ commands.
   file. TypeScript flags missing or misspelled fields.
 - **Contact details:** the email address and the mobile number come from `profile.links`. The
   mobile number is shown only in the Contact section.
-- **Logo:** the Ashline logo's words are `profile.brand`: the brand's name, the two halves
-  of the wordmark (`ash` and `line`), the three parts of the tagline (the middle one is
-  set in the accent colour) and the label a screen reader hears for the header link. The
-  drawing is not content: its shapes are `src/lib/logo-shapes.ts` and its colours are
-  design tokens, tied to each part in `src/app/styles/logo.css`. The component,
-  `src/components/logo.tsx`, has three variants: the mark alone, the mark with the
-  wordmark (the header and the footer), and the mark with the wordmark and the tagline
-  (built, but not placed on the site yet). One rule: the small version of the mark, for
-  32px and below, has no dot; the browser-tab icon and the app icons use it. The site's
-  title is still `profile.name`: the logo stands beside your name, it does not replace it.
+- **Company and logo:** the site belongs to Ashvanta Technologies. Its words are
+  `profile.brand`: the full name, the word beside the mark ("Ashvanta"), "Technologies",
+  the tagline "Technology for a Better Tomorrow.", the description used in search results,
+  and the label a screen reader hears for the header link. The site's title, the share
+  images and the structured data (an Organization with the owner as founder) are built
+  from it. The company's logo files are in `public/brand` (copied from the BillingRecon
+  repository). On the page the logo is the mark drawn from `src/lib/logo-shapes.ts` with
+  "Ashvanta" as real text beside it, because the full lockup's small lines cannot be read
+  at header size. Its colours are design tokens, tied to each part in
+  `src/app/styles/logo.css`; the site itself keeps its violet theme. The component,
+  `src/components/logo.tsx`, has three variants: the mark alone, the mark with
+  "Ashvanta" (the header and the footer), and the full logo with "TECHNOLOGIES" and the
+  tagline (built, but not placed on the site yet). One rule: the small version of the
+  mark, for 32px and below, has no squares; the browser-tab icon and the app icons use it.
 - **Hero:** the words of the first screen, the labels of its two buttons and the skill
   names drawn in the field behind it all come from `profile.hero`. List the skill names
   (`fieldLabels`) in order of importance: a phone shows the first three, and a wide screen

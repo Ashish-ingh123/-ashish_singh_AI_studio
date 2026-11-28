@@ -37,14 +37,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) notFound();
   const path = caseStudyPath(project);
   return {
-    // The root layout's title template appends the site owner's name.
+    // The root layout's title template appends the company's name.
     title: project.name,
     description: project.tagline,
     alternates: { canonical: path },
     // A page's openGraph replaces the layout's whole openGraph object, so siteName repeats.
     openGraph: {
       type: "article",
-      siteName: profile.name,
+      siteName: profile.brand.name,
       title: project.name,
       description: project.tagline,
       url: path,

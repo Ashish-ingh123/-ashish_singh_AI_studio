@@ -9,7 +9,7 @@ type Params = { slug: string };
 type Props = { params: Promise<Params> };
 
 // The preview card for links to a case-study page, one per project, rendered at build time.
-export const alt = `Project case study by ${profile.name}`;
+export const alt = `Project case study by ${profile.brand.name}`;
 export const size = ogSize;
 export const contentType = "image/png";
 
@@ -31,7 +31,7 @@ export default async function Image({ params }: Props) {
         heading={project.name}
         subheading={project.tagline}
         badge={project.status}
-        footerLeft={profile.name}
+        footerLeft={profile.brand.name}
         footerRight={siteUrl.host}
       />
     ),

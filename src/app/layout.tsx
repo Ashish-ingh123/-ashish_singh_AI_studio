@@ -28,9 +28,11 @@ const poppins = Poppins({
   weight: ["600", "700"],
 });
 
-// The first sentence of the summary makes a search-result description of sensible length.
-const description = profile.summary.split(". ")[0] + ".";
-const title = `${profile.name} | ${profile.title}`;
+// The site belongs to the company: its name and line make the title, its description the
+// search-result text. The founder stays the author.
+const { brand } = profile;
+const description = brand.description;
+const title = `${brand.name} | ${brand.tagline}`;
 
 export const metadata: Metadata = {
   // Every relative address in the metadata (Open Graph url, image routes) resolves
@@ -38,18 +40,19 @@ export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
     default: title,
-    // Inner pages set only their own name; the template appends the site owner.
-    template: `%s | ${profile.name}`,
+    // Inner pages set only their own name; the template appends the company.
+    template: `%s | ${brand.name}`,
   },
   description,
-  applicationName: profile.name,
+  applicationName: brand.name,
   authors: [{ name: profile.name, url: siteUrl }],
   creator: profile.name,
+  publisher: brand.name,
   // What chat apps, LinkedIn and X show when a link to the site is shared. The image
   // comes from src/app/opengraph-image.tsx automatically.
   openGraph: {
     type: "website",
-    siteName: profile.name,
+    siteName: brand.name,
     title,
     description,
     url: "/",

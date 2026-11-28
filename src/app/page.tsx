@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PersonJsonLd } from "@/components/person-json-ld";
+import { SiteJsonLd } from "@/components/site-json-ld";
 import { About } from "@/components/sections/about";
 import { Ask } from "@/components/sections/ask";
 import { Contact } from "@/components/sections/contact";
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <PersonJsonLd />
+      <SiteJsonLd />
       <Hero />
       <About />
       <Services />

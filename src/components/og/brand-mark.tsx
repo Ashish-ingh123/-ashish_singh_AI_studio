@@ -1,28 +1,33 @@
 import { LogoMark } from "@/components/og/logo-mark";
 import { ogTheme } from "@/components/og/theme";
+import { logoBox } from "@/lib/logo-shapes";
 
 type Props = {
   /** Width and height in pixels. */
   size: number;
   /**
-   * Draw the mark on a solid tile of the page's dark colour, with room round it. For
-   * the Apple icon: iOS fills see-through areas with black and cuts the corners itself,
-   * so that icon must cover its whole square.
+   * The Apple icon: iOS rounds the corners itself and fills see-through areas with black,
+   * so that icon is a square tile that covers its whole area, with more room round the
+   * mark to keep it clear of the corners iOS cuts.
    */
-  tile?: boolean;
+  apple?: boolean;
 };
 
-/** How much of the tile's height the mark takes, which keeps it clear of iOS's corners. */
-const TILE_SHARE = 0.62;
+/** How much of the icon's width the mark takes: a browser tab's icon, the Apple icon. */
+const TAB_SHARE = 0.86;
+const APPLE_SHARE = 0.7;
 
 /**
- * The site icon: the small version of the logo's mark, the hexagon with the letter A and
- * no dot. Rendered to PNG by next/og, not by the browser.
- *
- * Without a tile the hexagon is as tall as the icon and the rest is see-through, so in a
- * browser tab it sits on whatever colour the tab has.
+ * The site icon: the small version of the Ashvanta mark (no squares) on a white tile, in
+ * the logo's own colours, so it reads on light and dark browser tabs alike (the owner
+ * chose the tile on 2026-11-28). The tab icon's tile has rounded corners of its own; the
+ * Apple icon's is square, because iOS rounds it. Rendered to PNG by next/og, not by the
+ * browser.
  */
-export function BrandMark({ size, tile = false }: Props) {
+export function BrandMark({ size, apple = false }: Props) {
+  const share = apple ? APPLE_SHARE : TAB_SHARE;
+  // The mark is wider than tall, so its width sets the fit; LogoMark takes a height.
+  const markHeight = (size * share * logoBox.small.height) / logoBox.small.width;
   return (
     <div
       style={{
@@ -31,10 +36,11 @@ export function BrandMark({ size, tile = false }: Props) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...(tile && { backgroundColor: ogTheme.background }),
+        backgroundColor: ogTheme.iconTile,
+        ...(apple ? {} : { borderRadius: size * 0.22 }),
       }}
     >
-      <LogoMark height={tile ? size * TILE_SHARE : size} small />
+      <LogoMark height={markHeight} small colours={ogTheme.iconMark} />
     </div>
   );
 }

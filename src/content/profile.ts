@@ -544,23 +544,29 @@ export type Certification = {
 };
 
 /**
- * The words of the Ashline logo (src/components/logo.tsx). The drawing itself, a hexagon
- * with the letter A, lives in the code; everything that is text lives here.
+ * The company: Ashvanta Technologies. Its words are used by the logo
+ * (src/components/logo.tsx), the site's metadata (src/app/layout.tsx) and the
+ * Organization in the structured data (src/components/site-json-ld.tsx). The drawing of
+ * the mark lives in the code (src/lib/logo-shapes.ts); everything that is text lives here.
  */
 export type Brand = {
-  /** The brand's name as written in running text. */
+  /** The company's full name as written in running text. */
   name: string;
   /**
-   * The wordmark, in two halves set side by side with no space between them: the first
-   * in the text colour and a medium weight, the second in the accent colour and a
-   * regular weight.
+   * The word set beside the mark in the logo. Only the first word of the name: at the
+   * sizes the logo is used on the page, the full lockup's "TECHNOLOGIES" and tagline
+   * shrink past reading (the owner's choice, 2026-11-28).
    */
-  wordmark: { lead: string; accent: string };
+  wordmark: string;
+  /** The second line of the large logo, set in spaced capitals under the wordmark. */
+  kind: string;
+  /** The company's line: "Technology for a Better Tomorrow." */
+  tagline: string;
   /**
-   * The line under the wordmark, in three parts joined by spaces; the middle part is set
-   * in the accent colour. Not to be confused with profile.tagline, the list of skills.
+   * One or two sentences on what the company does, for search results and link
+   * previews. Every claim must be true of the BillingRecon repository today.
    */
-  tagline: { before: string; accent: string; after: string };
+  description: string;
   /**
    * What a screen reader calls the logo where it is a link, as in the header. It must
    * contain the wordmark's letters, so that what is heard matches what is seen.
@@ -571,7 +577,7 @@ export type Brand = {
 export type Profile = {
   name: string;
   title: string;
-  /** The Ashline brand: the words of the logo. The site's title is still `name`. */
+  /** The company, Ashvanta Technologies: the logo's words and the site's name. */
   brand: Brand;
   tagline: string;
   location: string;
@@ -622,10 +628,13 @@ export const profile: Profile = {
   name: "Ashish Singh",
   title: "Software Engineer",
   brand: {
-    name: "Ashline",
-    wordmark: { lead: "ash", accent: "line" },
-    tagline: { before: "From first", accent: "line", after: "to live." },
-    label: "Ashline, home page",
+    name: "Ashvanta Technologies",
+    wordmark: "Ashvanta",
+    kind: "Technologies",
+    tagline: "Technology for a Better Tomorrow.",
+    description:
+      "Ashvanta Technologies builds BillingRecon, billing, payments and receivables software for hospitals and clinics in India.",
+    label: "Ashvanta Technologies, home page",
   },
   tagline: "Full-Stack · .NET · React · Cloud · AI",
   location: "New Delhi, India",

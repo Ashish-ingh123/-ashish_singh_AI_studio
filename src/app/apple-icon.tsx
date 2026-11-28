@@ -8,5 +8,5 @@ export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
 export default function AppleIcon() {
-  return new ImageResponse(<BrandMark size={size.width} tile />, size);
+  return new ImageResponse(<BrandMark size={size.width} apple />, size);
 }

@@ -70,11 +70,15 @@
   --orb-dark: #4c1d95;
 
   /*
-    The logo (styles/logo.css). Its hexagon is the same violet in both themes; the dot
-    beside it is the text colour here and a light violet on the dark page.
+    The Ashvanta logo (styles/logo.css says which part takes which). The logo keeps its
+    own colours, navy, blue and orange, on the site's violet theme (the owner kept the
+    violet theme on 2026-11-28). On the dark page the navy parts turn to the text colour,
+    because the navy would all but vanish there: the usual "reversed" logo.
   */
-  --logo-mark: #7c3aed;
-  --logo-dot: var(--foreground);
+  --logo-navy: #0b2a5b;
+  --logo-blue: #1f6feb;
+  --logo-orange: #f58a1f;
+  --logo-cut: var(--background);
 }
 
 .dark {
@@ -100,7 +104,7 @@
   --backdrop-glow: rgb(113 39 186 / 0.3);
   --orb-glow: rgb(139 61 255 / 0.55);
 
-  --logo-dot: #c4a1ff;
+  --logo-navy: var(--foreground);
 }
 
 /* Expose the tokens to Tailwind so classes like bg-card or text-muted-foreground exist. */

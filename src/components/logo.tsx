@@ -5,44 +5,45 @@ import { logoBox, logoMark } from "@/lib/logo-shapes";
 /**
  * Which parts of the logo to draw:
  *
- *   - "mark":     the hexagon with the letter A, and the dot beside it;
- *   - "wordmark": the mark, then the brand's name in two colours;
- *   - "tagline":  the same, with the brand's line under the name.
+ *   - "mark":     the Ashvanta A alone;
+ *   - "wordmark": the mark, then "Ashvanta" as real text;
+ *   - "full":     the mark, then "Ashvanta", "TECHNOLOGIES" and the tagline in three
+ *                 rows. Only legible large, so only for the lg size.
  */
-export type LogoVariant = "mark" | "wordmark" | "tagline";
+export type LogoVariant = "mark" | "wordmark" | "full";
 
 /**
  * How large the logo is, as a step of the type scale (see globals.css). The step is the
  * wordmark's text size; the mark's height follows from it.
  */
 const sizes = {
-  /** 16px text, a mark 30px tall: the footer. */
+  /** 16px text, a mark 28px tall: the footer. */
   sm: "text-base",
-  /** 18px text, a mark 34px tall: the header. */
+  /** 18px text, a mark 31.5px tall: the header. */
   md: "text-lg",
-  /** 28 to 40px text, a mark 52 to 75px tall: the logo standing by itself. */
+  /** 28 to 40px text, a mark 49 to 70px tall: the logo standing by itself. */
   lg: "text-heading",
 } as const;
 
 /**
- * The mark's height, measured in the wordmark's text size (em). In the artwork the
- * hexagon is 1.875 times as tall as the wordmark's letters are large, so sizing it in em
- * keeps that proportion at every size, and one class scales the whole logo.
+ * The mark's height, measured in the wordmark's text size (em), so that one text-size
+ * class scales the mark and the word together.
  */
-const MARK_EM = 1.875;
+const MARK_EM = 1.75;
 
 type MarkProps = {
-  /** The small version, without the dot. */
+  /** The small version, without the three squares. */
   small: boolean;
 };
 
 /**
  * The drawing. It is always hidden from screen readers: where the logo needs a name,
- * the Logo component supplies it as text.
+ * the Logo component supplies it as text. Each part carries a class that logo.css ties
+ * to a colour token, so the mark follows the theme with no script.
  */
 function Mark({ small }: MarkProps) {
   const box = small ? logoBox.small : logoBox.full;
-  const { hexagon, letter, crossbar, dot } = logoMark;
+  const { leftLeg, rightLeg, swoosh, squares, square } = logoMark;
   return (
     <svg
       aria-hidden="true"
@@ -56,39 +57,29 @@ function Mark({ small }: MarkProps) {
         width: `${((MARK_EM * box.width) / box.height).toFixed(4)}em`,
       }}
     >
+      <polygon className="logo-blue" points={leftLeg} />
+      <polygon className="logo-navy" points={rightLeg} />
       <path
-        className="logo-hexagon"
-        d={hexagon.d}
-        strokeWidth={hexagon.strokeWidth}
+        className="logo-swoosh"
+        d={swoosh.d}
+        strokeWidth={swoosh.strokeWidth}
         strokeLinejoin="round"
+        paintOrder="stroke"
       />
-      <path
-        className="logo-letter"
-        d={letter.d}
-        strokeWidth={letter.strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <line
-        className="logo-letter"
-        x1={crossbar.x1}
-        y1={crossbar.y1}
-        x2={crossbar.x2}
-        y2={crossbar.y2}
-        strokeWidth={crossbar.strokeWidth}
-        strokeLinecap="butt"
-      />
-      {!small && (
-        <circle
-          className="logo-dot"
-          cx={dot.cx}
-          cy={dot.cy}
-          r={dot.r}
-          // Where the dot's trip starts, for the stylesheet: the crossbar's left end,
-          // measured from the dot's own place. Negative, because that is to the left.
-          style={{ "--logo-trip": `${crossbar.x1 - dot.cx}px` } as CSSProperties}
-        />
-      )}
+      {!small &&
+        squares.map((s, i) => (
+          <rect
+            key={s.part}
+            className={`logo-square logo-${s.part}`}
+            x={s.x}
+            y={s.y}
+            width={square.size}
+            height={square.size}
+            rx={square.radius}
+            // Its turn in the hover effect: the squares light up one after another.
+            style={{ "--i": i } as CSSProperties}
+          />
+        ))}
     </svg>
   );
 }
@@ -97,9 +88,9 @@ type Props = {
   variant?: LogoVariant;
   size?: keyof typeof sizes;
   /**
-   * Draw the small version of the mark: no dot. The rule is to use it at 32px and below,
-   * where the dot would be a speck. Every use on the page is larger than that; the
-   * browser-tab icon is the one that is not (src/components/og/brand-mark.tsx).
+   * Draw the small version of the mark: no squares. The rule is to use it at 32px and
+   * below, where a square would be a speck. Every use on the page is larger than that;
+   * the icons are the ones that are not (src/components/og/brand-mark.tsx).
    */
   small?: boolean;
   /**
@@ -109,7 +100,7 @@ type Props = {
    */
   labelled?: boolean;
   /**
-   * Let the dot run once along the crossbar each time the logo is hovered (see
+   * Light the three squares one after another each time the logo is hovered (see
    * styles/logo.css). For the header's logo; nothing plays until a pointer is over it.
    */
   animated?: boolean;
@@ -122,16 +113,20 @@ type Props = {
 };
 
 /**
- * The Ashline logo. Its words come from profile.brand, its shapes from
+ * The Ashvanta Technologies logo. Its words come from profile.brand, its shapes from
  * src/lib/logo-shapes.ts and its colours from src/app/styles/logo.css, where each part
  * is tied to a design token, so the logo changes with the theme like everything else.
  *
+ * It is the mark with "Ashvanta" set as real text beside it, not the company's lockup
+ * file: at header and footer sizes the lockup's "TECHNOLOGIES" and tagline are a few
+ * pixels tall and cannot be read, while text stays sharp at any size.
+ *
  * It has no script of its own and can be rendered on the server.
  *
- * Accessibility: a logo's letters are a picture of a name, so they are hidden from
- * screen readers (the name would otherwise be read twice, or letter group by letter
- * group). With `labelled` the name is given once, as hidden text. The tagline is a
- * sentence in its own right and stays readable, unless the whole logo is decoration.
+ * Accessibility: the word beside the mark is a picture of a name, so it is hidden from
+ * screen readers (the name would otherwise be read twice). With `labelled` the full name
+ * is given once, as hidden text. In the full variant the tagline is a sentence in its
+ * own right and stays readable, unless the whole logo is decoration.
  */
 export function Logo({
   variant = "wordmark",
@@ -143,41 +138,37 @@ export function Logo({
   className,
 }: Props) {
   const { brand } = profile;
-  const withTagline = variant === "tagline";
+  const full = variant === "full";
 
   return (
     <span
       aria-hidden={labelled ? undefined : true}
-      className={`logo inline-flex items-center gap-[0.55em] font-sans leading-none ${sizes[size]} ${animated ? "logo-animated" : ""} ${className ?? ""}`}
+      className={`logo inline-flex items-center gap-[0.45em] leading-none ${sizes[size]} ${animated ? "logo-animated" : ""} ${className ?? ""}`}
     >
       {labelled && <span className="sr-only">{brand.label}</span>}
       <Mark small={small} />
       {variant !== "mark" && (
-        // With a tagline the words are three rows, the outer two of equal height: that
-        // keeps the name level with the middle of the mark and hangs the tagline below.
         <span
-          className={`${withTagline ? "grid grid-rows-[1fr_auto_1fr]" : ""} ${wordsClassName ?? ""}`}
+          className={`${full ? "grid gap-[0.3em]" : ""} ${wordsClassName ?? ""}`}
         >
-          {/*
-            Raised by a twelfth of its size: a line of text is centred on its whole box,
-            which leaves the small letters sitting low. Raised, their middle is level
-            with the middle of the hexagon, as in the artwork.
-          */}
           <span
             aria-hidden="true"
-            className={`relative -top-[0.08em] whitespace-nowrap ${withTagline ? "row-start-2" : ""}`}
+            className="logo-word font-display font-bold whitespace-nowrap"
           >
-            <span className="logo-lead font-medium">{brand.wordmark.lead}</span>
-            <span className="logo-accent font-normal">
-              {brand.wordmark.accent}
-            </span>
+            {brand.wordmark}
           </span>
-          {withTagline && (
-            <span className="logo-tagline row-start-3 mt-1 self-start text-xs leading-none font-normal tracking-wider whitespace-nowrap">
-              {brand.tagline.before}{" "}
-              <span className="logo-accent">{brand.tagline.accent}</span>{" "}
-              {brand.tagline.after}
-            </span>
+          {full && (
+            <>
+              <span
+                aria-hidden="true"
+                className="logo-kind text-xs font-semibold tracking-[0.3em] whitespace-nowrap uppercase"
+              >
+                {brand.kind}
+              </span>
+              <span className="logo-tagline text-xs italic whitespace-nowrap">
+                {brand.tagline}
+              </span>
+            </>
           )}
         </span>
       )}
