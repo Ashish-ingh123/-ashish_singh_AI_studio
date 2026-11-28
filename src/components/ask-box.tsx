@@ -21,7 +21,7 @@ type Props = {
 };
 
 /**
- * The working part of "Ask about Ashish": the question field, the ready-made questions
+ * The working part of "Ask about Ashvanta": the question field, the ready-made questions
  * and the answer. It posts the question to /api/ask and shows the answer as it arrives.
  *
  * The answer is plain text from start to finish: it is put on the page as a text node,

@@ -11,6 +11,7 @@ import {
   emptyContactValues,
   normaliseContact,
   serviceOptions,
+  organisationOptions,
   timelineOptions,
   validateContact,
   type ContactValues,
@@ -235,7 +236,7 @@ export function ContactForm({ focusSignal }: Props) {
   }
 
   function selectField(
-    field: "service" | "timeline",
+    field: "service" | "timeline" | "organisation",
     required: boolean,
     options: { key: string; label: string }[],
   ) {
@@ -272,9 +273,8 @@ export function ContactForm({ focusSignal }: Props) {
           {textField("email", true, "email", "email")}
           {textField("phone", false, "tel", "tel")}
           {textField("company", false, "text", "organization")}
-          <div className="sm:col-span-2">
-            {selectField("service", true, serviceOptions)}
-          </div>
+          {selectField("organisation", false, organisationOptions)}
+          {selectField("service", true, serviceOptions)}
           {textField("budget", false, "text", "off")}
           {selectField("timeline", false, timelineOptions)}
           <div className="sm:col-span-2">

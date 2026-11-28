@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Hammer } from "lucide-react";
 import { cardClasses } from "@/components/card";
 import { Reveal } from "@/components/reveal";
+import { SocialLinks } from "@/components/social-links";
 import { Section } from "@/components/section";
 import { profile } from "@/content/profile";
 
@@ -29,24 +30,48 @@ function Fact({
 }
 
 /**
- * The summary in full, and beside it the same person at a glance: a panel of facts. The
- * panel adds no content of its own. Its labels come from profile.labels.about and every
- * value is read from the field that already holds it, so nothing is typed twice.
+ * The company (Step 7 of the Ashvanta site, 2026-11-28): its story on the left with the
+ * founder's card under it, and beside them the company at a glance, a panel of facts. The
+ * panel adds no content of its own: its labels come from profile.labels.about and every
+ * value is read from the field that already holds it, so nothing is typed twice. The
+ * founder's text names no employer.
  */
 export function About() {
   const labels = profile.labels.about;
+  const { company } = profile;
+  const productItem = profile.nav.find((item) => item.id === "product");
 
   return (
     <Section id="about" space="compact">
-      {/*
-        Two columns from lg: the summary on the left, in a column narrow enough to read
-        comfortably, and the panel beside it, level with its first line. On narrower
-        screens the panel goes under the text.
-      */}
       <Reveal className="grid gap-8 lg:grid-cols-12 lg:gap-12">
-        <p className="text-lg leading-relaxed text-muted-foreground lg:col-span-7">
-          {profile.summary}
-        </p>
+        <div className="lg:col-span-7">
+          {company.story.map((paragraph) => (
+            <p
+              key={paragraph}
+              className="mt-4 text-lg leading-relaxed text-muted-foreground first:mt-0"
+            >
+              {paragraph}
+            </p>
+          ))}
+
+          {/* The founder: a card of his own, with his links. */}
+          <div className={`${cardClasses} mt-8 p-5 sm:p-6`}>
+            <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              {company.founderHeading}
+            </h3>
+            <p className="mt-2 text-lg font-semibold">
+              {profile.name}
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                · {company.founderRole}
+              </span>
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {company.founderText}
+            </p>
+            <SocialLinks className="-ml-2.5 mt-3" />
+          </div>
+        </div>
 
         {/*
           dl is the HTML list for name and value pairs: each dt names a fact and the dd
@@ -56,10 +81,15 @@ export function About() {
         <dl
           className={`${cardClasses} grid grid-cols-2 gap-x-6 gap-y-5 p-5 sm:p-6 lg:col-span-5 lg:self-start`}
         >
-          <Fact label={labels.role}>{profile.title}</Fact>
+          <Fact label={labels.founder}>{profile.name}</Fact>
           <Fact label={labels.location}>{profile.location}</Fact>
           <Fact label={labels.focus} wide>
-            {profile.tagline}
+            {profile.hero.badge}
+          </Fact>
+          <Fact label={labels.product} wide>
+            <a href="#product" className="text-accent">
+              <span className="link-draw">{productItem?.label}</span>
+            </a>
           </Fact>
           <Fact label={labels.availability} wide>
             <span className="inline-flex items-center gap-2">
@@ -67,7 +97,7 @@ export function About() {
                 aria-hidden="true"
                 className="h-2 w-2 rounded-full bg-accent"
               />
-              {profile.availability}
+              {profile.product.status}
             </span>
           </Fact>
 

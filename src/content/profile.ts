@@ -38,13 +38,15 @@ export type NavItem = {
 export type Labels = {
   /** The facts panel in the About section. Each value comes from the field named here. */
   about: {
-    /** Printed over profile.title. */
-    role: string;
-    /** Printed over profile.tagline. */
+    /** Printed over profile.name, the founder (since Step 7, the company's facts). */
+    founder: string;
+    /** Printed over profile.hero.badge. */
     focus: string;
     /** Printed over profile.location. */
     location: string;
-    /** Printed over profile.availability. */
+    /** Printed over the BillingRecon section's name, linking to it. */
+    product: string;
+    /** Printed over profile.product.status. */
     availability: string;
     /** Printed over profile.currentlyBuilding. */
     now: string;
@@ -361,7 +363,7 @@ export type Pipeline = {
 };
 
 /**
- * The words of "Ask about Ashish", the question box above the Contact section. A visitor
+ * The words of "Ask about Ashvanta", the question box above the Contact section. A visitor
  * types a question and an AI model answers it from the content of this file only. The
  * box must always say plainly that the answers are AI-generated, and never suggest that
  * the site's owner is typing them.
@@ -403,6 +405,7 @@ export type ContactField =
   | "email"
   | "phone"
   | "company"
+  | "organisation"
   | "service"
   | "budget"
   | "timeline"
@@ -410,6 +413,9 @@ export type ContactField =
 
 /** The answers offered for "Timeline". The key is what the form sends; the label is shown. */
 export type ContactTimeline = "asap" | "month" | "quarter" | "unsure";
+
+/** The answers offered for "Type of organisation" (Step 7 of the Ashvanta site). */
+export type ContactOrganisation = "hospital" | "clinic" | "lab" | "other";
 
 /** What one field of the form says about itself. */
 export type ContactFieldWords = {
@@ -437,10 +443,14 @@ export type ContactForm = {
   fields: Record<ContactField, ContactFieldWords>;
   /** The first, empty line of the two selects. */
   choose: string;
+  /** The first line of "What you need", before the titles of profile.services. */
+  demoService: string;
   /** The last line of "What you need", after the titles of profile.services. */
   otherService: string;
   /** The answers offered for "Timeline", in order. */
   timelines: { key: ContactTimeline; label: string }[];
+  /** The answers offered for "Type of organisation", in order. */
+  organisations: { key: ContactOrganisation; label: string }[];
   /** Text of the send button, at rest and while the email is being sent. */
   submit: string;
   sending: string;
@@ -810,6 +820,17 @@ export type Profile = {
   currentlyBuilding: string;
   /** Shown in the Services section above the cards. */
   servicesIntro: string;
+  /**
+   * The About section since Step 7 of the Ashvanta site (2026-11-28): the company's story
+   * and its founder. The founder's text describes his current role without naming the
+   * employer (see the working notes in CLAUDE.md).
+   */
+  company: {
+    story: string[];
+    founderHeading: string;
+    founderRole: string;
+    founderText: string;
+  };
   /** Shown in the Contact section above the buttons. */
   contactNote: string;
   /**
@@ -1192,9 +1213,19 @@ export const profile: Profile = {
   currentlyBuilding:
     "Building BillingRecon, billing and receivables software for hospitals and clinics in India: release 1 is built; release 2, bank reconciliation, is planned.",
   servicesIntro:
-    "Have an idea, or a problem in software you already run? This is the kind of work I take on, from a single feature to a complete product.",
+    "Have an idea, or a problem in software you already run? This is the kind of work we take on, from a single feature to a complete product.",
+  company: {
+    story: [
+      "Ashvanta Technologies builds software to order: web applications and APIs, integrations with the systems a business already runs, cloud deployments, and AI features built on retrieval-augmented generation and LLMs.",
+      "Its own product is BillingRecon, billing, payments and receivables software for hospitals and clinics in India, built so that the money is always right. Technology for a Better Tomorrow means software whose numbers can be trusted, and honesty about what is built and what is still planned.",
+    ],
+    founderHeading: "The founder",
+    founderRole: "Founder",
+    founderText:
+      "A software engineer who builds production software across the stack with C#, .NET, SQL Server, AngularJS and React, with Docker, Redis and AWS. In his current role he develops and maintains a large healthcare ERP: billing workflows, payment and fiscal e-invoicing integrations, WhatsApp messaging, scheduled reporting and production debugging. He designed and built BillingRecon.",
+  },
   contactNote:
-    "Have something to build, or need another developer on your team? Call or email me, or send the details with the form below.",
+    "Want to see BillingRecon, or have something to build? Call or email us, or send the details with the form below.",
   siteUrl: "",
   links: {
     email: "ashishsingh17708@gmail.com",
@@ -1206,7 +1237,7 @@ export const profile: Profile = {
     { id: "product", label: "BillingRecon" },
     { id: "features", label: "Features", heading: "What BillingRecon does" },
     { id: "about", label: "About" },
-    { id: "services", label: "Services", heading: "What I can build" },
+    { id: "services", label: "Services", heading: "What we build" },
     { id: "experience", label: "Experience" },
     { id: "skills", label: "Skills" },
     { id: "projects", label: "Projects" },
@@ -1216,9 +1247,10 @@ export const profile: Profile = {
   menu: ["product", "features", "services", "about", "contact"],
   labels: {
     about: {
-      role: "Role",
-      focus: "Focus",
+      founder: "Founded by",
       location: "Based in",
+      focus: "What we do",
+      product: "Our product",
       availability: "Status",
       now: "Right now",
     },
@@ -1382,33 +1414,33 @@ export const profile: Profile = {
     replayLabel: "Replay",
   },
   ask: {
-    heading: "Ask about Ashish",
+    heading: "Ask about Ashvanta",
     aiLabel: "AI-generated, answers only from this site",
     intro:
-      "Have a quick question about my experience, skills or projects? Ask it here and an AI assistant will answer from what is written on this site.",
+      "Have a quick question about Ashvanta Technologies, BillingRecon or the work we take on? Ask it here and an AI assistant will answer from what is written on this site.",
     inputLabel: "Your question",
-    placeholder: "For example: what has he built with .NET?",
+    placeholder: "For example: what does BillingRecon do?",
     submit: "Ask",
     stop: "Stop",
     suggestions: [
-      "What kind of work does Ashish take on?",
-      "What has he built with C# and .NET?",
       "What is BillingRecon, and how far along is it?",
-      "Which AI skills does he have?",
-      "What experience does he have with Docker, Redis and AWS?",
+      "How does BillingRecon keep the money right?",
+      "Can I see a demo of BillingRecon?",
+      "What kind of custom work does Ashvanta take on?",
+      "Who founded Ashvanta Technologies?",
     ],
     dataNotice:
-      "Questions are sent to Google's Gemini API to write the answer, and Google may use them to improve its products. Please do not enter personal information. The answers are written by an AI model, not by Ashish, and can be wrong.",
+      "Questions are sent to Google's Gemini API to write the answer, and Google may use them to improve its products. Please do not enter personal information. The answers are written by an AI model, not by a person, and can be wrong.",
     busy: "The assistant is busy right now. Please try again in a minute.",
     unavailable:
-      "The assistant is not available at the moment. You can reach me through the Contact section.",
+      "The assistant is not available at the moment. You can reach us through the Contact section.",
     error: "Something went wrong. Please try again.",
     empty: "The assistant had no answer for that. Try asking it another way.",
   },
   contactForm: {
-    heading: "Send your requirement",
+    heading: "Request a demo or send your requirement",
     intro:
-      "Tell me what you need and I will reply by email. A few lines are enough to start.",
+      "Ask for a demo of BillingRecon, or tell us what you need built. We reply by email; a few lines are enough to start.",
     optional: "optional",
     fields: {
       name: {
@@ -1427,9 +1459,13 @@ export const profile: Profile = {
         error: "Use only digits, spaces and + - ( ) here, up to {max} characters.",
       },
       company: {
-        label: "Company",
-        placeholder: "Company or organisation",
+        label: "Organisation",
+        placeholder: "Hospital, clinic or company",
         error: "Please keep this to {max} characters.",
+      },
+      organisation: {
+        label: "Type of organisation",
+        error: "Please choose one of the options.",
       },
       service: {
         label: "What you need",
@@ -1445,12 +1481,14 @@ export const profile: Profile = {
         error: "Please choose one of the options.",
       },
       details: {
-        label: "Project details",
-        placeholder: "What should it do, who is it for, and what exists already?",
-        error: "Please describe the project in {min} to {max} characters.",
+        label: "Details",
+        placeholder:
+          "For a demo: your hospital or clinic, and when suits you. For a project: what should it do, who is it for, and what exists already?",
+        error: "Please describe what you need in {min} to {max} characters.",
       },
     },
     choose: "Choose one",
+    demoService: "A BillingRecon demo",
     otherService: "Other",
     timelines: [
       { key: "asap", label: "As soon as possible" },
@@ -1458,23 +1496,29 @@ export const profile: Profile = {
       { key: "quarter", label: "1 to 3 months" },
       { key: "unsure", label: "Not sure yet" },
     ],
-    submit: "Send requirement",
+    organisations: [
+      { key: "hospital", label: "Hospital" },
+      { key: "clinic", label: "Clinic" },
+      { key: "lab", label: "Diagnostic lab" },
+      { key: "other", label: "Other" },
+    ],
+    submit: "Send",
     sending: "Sending",
     checkFields: "Please check the marked fields.",
-    sent: "Thank you. Your requirement has been sent, and I will reply to the email address you gave.",
+    sent: "Thank you. Your message has been sent, and we will reply to the email address you gave.",
     failed:
-      "Your requirement could not be sent. Please try again, or use the email address above.",
+      "Your message could not be sent. Please try again, or use the email address above.",
     unavailable:
       "The form is not available at the moment. Please use the email address above.",
     busy: "Too many messages were sent from this connection. Please try again later, or use the email address above.",
-    emailInstead: "Email me instead",
+    emailInstead: "Email us instead",
     noScript:
       "The form needs JavaScript. Please use the email address or the phone number above.",
     privacy:
-      "Your details are emailed to me through Resend, an email delivery service, and are not stored on this site.",
-    paletteLabel: "Send a requirement",
+      "Your details are emailed to us through Resend, an email delivery service, and are not stored on this site.",
+    paletteLabel: "Request a demo",
     email: {
-      subject: "New requirement from {name}: {service}",
+      subject: "New request from {name}: {service}",
       notGiven: "Not given",
       footer: "Sent from the form on {site}.",
     },

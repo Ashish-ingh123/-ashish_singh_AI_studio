@@ -8,6 +8,7 @@ import {
   isEmail,
   normaliseContact,
   serviceLabel,
+  organisationLabel,
   timelineLabel,
   validateContact,
   type ContactValues,
@@ -64,6 +65,7 @@ function emailText(values: ContactValues): string {
   const words = profile.contactForm;
   const shown: Record<ContactField, string> = {
     ...values,
+    organisation: organisationLabel(values.organisation) ?? "",
     service: serviceLabel(values.service) ?? "",
     timeline: timelineLabel(values.timeline) ?? "",
   };

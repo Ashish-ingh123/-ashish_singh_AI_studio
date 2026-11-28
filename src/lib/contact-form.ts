@@ -1,6 +1,7 @@
 import {
   profile,
   type ContactField,
+  type ContactOrganisation,
   type ContactTimeline,
   type ServiceIcon,
 } from "@/content/profile";
@@ -21,6 +22,7 @@ export const CONTACT_FIELDS: ContactField[] = [
   "email",
   "phone",
   "company",
+  "organisation",
   "service",
   "budget",
   "timeline",
@@ -44,8 +46,11 @@ export const CONTACT_LIMITS = {
  */
 export const HONEYPOT_FIELD = "website";
 
-/** What "What you need" may hold: a service, named by its icon key, or "other". */
-export type ContactService = ServiceIcon | "other";
+/**
+ * What "What you need" may hold: a BillingRecon demo, a service named by its icon key, or
+ * "other".
+ */
+export type ContactService = "demo" | ServiceIcon | "other";
 
 /** Everything the form sends, as text. An empty string means "left empty". */
 export type ContactValues = Record<ContactField, string>;
@@ -55,14 +60,16 @@ export const emptyContactValues: ContactValues = {
   email: "",
   phone: "",
   company: "",
+  organisation: "",
   service: "",
   budget: "",
   timeline: "",
   details: "",
 };
 
-/** The lines of "What you need": every service in profile.ts, then "Other". */
+/** The lines of "What you need": a BillingRecon demo, every service in profile.ts, then "Other". */
 export const serviceOptions: { key: ContactService; label: string }[] = [
+  { key: "demo", label: profile.contactForm.demoService },
   ...profile.services.map((service) => ({
     key: service.icon,
     label: service.title,
@@ -72,6 +79,13 @@ export const serviceOptions: { key: ContactService; label: string }[] = [
 
 export const timelineOptions: { key: ContactTimeline; label: string }[] =
   profile.contactForm.timelines;
+
+export const organisationOptions: { key: ContactOrganisation; label: string }[] =
+  profile.contactForm.organisations;
+
+export function organisationLabel(key: string): string | undefined {
+  return organisationOptions.find((option) => option.key === key)?.label;
+}
 
 /** The text shown for a chosen service or timeline; undefined for an unknown key. */
 export function serviceLabel(key: string): string | undefined {
@@ -112,6 +126,7 @@ export function normaliseContact(values: ContactValues): ContactValues {
     email: cleanLine(values.email),
     phone: cleanLine(values.phone),
     company: cleanLine(values.company),
+    organisation: values.organisation.trim(),
     service: values.service.trim(),
     budget: cleanLine(values.budget),
     timeline: values.timeline.trim(),
@@ -160,6 +175,10 @@ export function validateContact(
     fail("phone");
   }
   if (!withinLimits(values.company, "company")) fail("company");
+  // The type of organisation may be left empty; anything else must be an offered answer.
+  if (values.organisation && !organisationLabel(values.organisation)) {
+    fail("organisation");
+  }
   if (!serviceLabel(values.service)) fail("service");
   if (!withinLimits(values.budget, "budget")) fail("budget");
   // The timeline may be left empty; anything else must be one of the offered answers.

@@ -1,5 +1,5 @@
 /*
-  Styles for "Ask about Ashish", the question box above the Contact section
+  Styles for "Ask about Ashvanta", the question box above the Contact section
   (sections/ask.tsx, ask-box.tsx). Imported by globals.css. Use the design tokens
   (var(--accent), var(--border) and so on), never raw colours.
 */

@@ -4,7 +4,7 @@ import { Reveal } from "@/components/reveal";
 import { profile } from "@/content/profile";
 
 /**
- * "Ask about Ashish": a question box whose answers are written by an AI model from the
+ * "Ask about Ashvanta": a question box whose answers are written by an AI model from the
  * content of profile.ts. It sits just above the Contact section, well below the first
  * screen, and has no number and no place in the nav: it is a tool, not a section.
  *

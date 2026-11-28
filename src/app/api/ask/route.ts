@@ -4,7 +4,7 @@ import { askSystemInstruction } from "@/lib/ask-context";
 import { allowedOrigin, clientAddress, createLimiter } from "@/lib/request-guard";
 
 /*
-  The server side of "Ask about Ashish". The browser posts one question; this handler
+  The server side of "Ask about Ashvanta". The browser posts one question; this handler
   sends it to Google's Gemini API together with the facts from profile.ts and streams the
   answer back as plain text. Think of it as a small ASP.NET minimal API endpoint that
   sits between the page and the provider, so the API key never leaves the server.
