@@ -4,21 +4,15 @@ import { HeroFieldLoader } from "@/components/hero-field-loader";
 import { SocialLinks } from "@/components/social-links";
 import { TypedRoles } from "@/components/typed-roles";
 import { profile } from "@/content/profile";
-import { rolePlace } from "@/lib/role-place";
 
 /**
- * The first screen: who this is, what he does and the two things to do next, in that
- * order, over a live field of points (hero-field.tsx). The text is rendered on the server
- * and is complete before any script runs; the field arrives later and sits behind it.
+ * The first screen: the company, what BillingRecon does and the two things to do next,
+ * in that order, over a live field of points (hero-field.tsx). The text is rendered on
+ * the server and is complete before any script runs; the field arrives later and sits
+ * behind it.
  */
 export function Hero() {
   const { hero } = profile;
-  const current = profile.experience.find((job) => job.end === "Present");
-  // The company, or the location when the current job names no company.
-  const place = current && rolePlace(current);
-  // The pin beside the availability pill would repeat a location the "currently" line
-  // already shows.
-  const showLocation = !(place?.isLocation && place.name === profile.location);
 
   return (
     // "isolate" gives the hero its own stacking order, so the field's z-index of -1 puts it
@@ -47,14 +41,12 @@ export function Hero() {
                 aria-hidden="true"
                 className="h-2 w-2 rounded-full bg-accent"
               />
-              {profile.availability}
+              {hero.badge}
             </p>
-            {showLocation && (
-              <p className="inline-flex items-center gap-1.5 text-muted-foreground">
-                <MapPin className="h-4 w-4" aria-hidden="true" />
-                {profile.location}
-              </p>
-            )}
+            <p className="inline-flex items-center gap-1.5 text-muted-foreground">
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              {profile.location}
+            </p>
           </div>
 
           {/*
@@ -67,6 +59,8 @@ export function Hero() {
             <span className="animate-rise block font-sans text-base font-normal lg:text-lg">
               {hero.greeting}{" "}
               <span className="font-semibold text-accent">{profile.name}</span>
+              {hero.founderOf}{" "}
+              <span className="font-semibold">{profile.brand.name}</span>
             </span>
             <span
               className="animate-rise mt-2.5 block font-sans text-xl font-normal lg:text-2xl"
@@ -141,19 +135,13 @@ export function Hero() {
                 {hero.rolePrefix} <TypedRoles roles={hero.roles} />
               </span>
             </p>
-            {current && place && (
-              <p className="mt-1 text-base lg:text-lg">
-                {hero.currentLabel} {current.role} {place.joiner}{" "}
-                <span className="font-semibold text-accent">{place.name}</span>
-              </p>
-            )}
           </div>
 
           <p
             className="animate-fade-up mt-4.5 max-w-xl text-[0.9375rem] leading-relaxed text-muted-foreground lg:text-base"
             style={{ animationDelay: "360ms" }}
           >
-            {profile.pitch}
+            {hero.closing}
           </p>
         </div>
       </div>

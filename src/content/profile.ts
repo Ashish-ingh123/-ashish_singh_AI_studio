@@ -97,6 +97,15 @@ export type Labels = {
     github: string;
   };
   /**
+   * The footer. Its links are the sections named in `links`, with their menu labels; the
+   * phone number is never among them (rule 5).
+   */
+  footer: {
+    /** What a screen reader calls the footer's row of section links. */
+    nav: string;
+    links: SectionId[];
+  };
+  /**
    * The command palette: the search box that opens from the header button or with
    * Ctrl+K and lists the sections, the case studies and a few actions.
    */
@@ -215,32 +224,49 @@ export type SkillCategory = {
 };
 
 /**
- * The words of the hero. The role in its "currently" line, and the company or location
- * after it, come from experience.
+ * The words of the hero: the company's first screen (Step 3 of the Ashvanta site,
+ * 2026-11-28). The company's name comes from profile.brand, the founder's from
+ * profile.name and profile.location. Every claim about BillingRecon must be built
+ * (BILLINGRECON-FACTS.md beside the repository).
  */
 export type Hero = {
-  /** Small line before the name, for example "Hello! I am". */
+  /** The pill at the top, for example "Hospital billing software · India". */
+  badge: string;
+  /**
+   * The first line of the heading is greeting, the founder's name, founderOf and the
+   * company's name: "Hello! I am Ashish Singh, founder of Ashvanta Technologies" (the
+   * owner's wording, 2026-11-28).
+   */
   greeting: string;
-  /** Lead-in above the big statement. */
+  /** The words between the founder's name and the company's, for example ", founder of". */
+  founderOf: string;
+  /**
+   * Lead-in above the big statement. The headline (lead, statement, highlight) is the
+   * site's original one, which the owner chose to keep on 2026-11-28.
+   */
   lead: string;
   /** The big statement, without its final highlighted word. */
   statement: string;
   /** The last word of the statement, drawn in the accent gradient and circled. */
   highlight: string;
-  /** One line under the statement. */
+  /** One line under the statement: what the company builds, BillingRecon included. */
   note: string;
-  /** Start of the typed line, for example "I'm". */
+  /**
+   * Start of the typed line, for example "We build:". The longest phrase after it must
+   * fit one line of a 360px phone (about 37 letters in all): the line does not wrap.
+   */
   rolePrefix: string;
   /**
-   * Roles typed one after another, each with its article ("a" or "an"). The last one
-   * stays on screen, and is also what visitors who prefer reduced motion see.
+   * Phrases typed one after another after rolePrefix; each must be built. The last one
+   * stays on screen, and is also what visitors who prefer reduced motion see. Keep the
+   * three under about 65 letters in all, so the run stays under five seconds.
    */
   roles: string[];
-  /** Words before the current role, for example "Currently working as a". */
-  currentLabel: string;
+  /** The closing paragraph of the hero. */
+  closing: string;
   /** Text of the main button, which leads to the Contact section. */
   primaryAction: string;
-  /** Text of the second button, which leads to the Projects section. */
+  /** Text of the second button, which leads to the BillingRecon section. */
   secondaryAction: string;
   /**
    * Skill names drawn beside a few points of the field behind the hero. Decoration only:
@@ -600,8 +626,18 @@ export type Profile = {
    */
   siteUrl: string;
   links: Links;
-  /** Section links shown in the header, in page order. */
+  /**
+   * Every homepage section, in page order: its anchor id, its menu label and its heading.
+   * A section's number ("01", "02" ...) is its place in this list, so every section that
+   * uses the Section component must be listed here, in the menu or not.
+   */
   nav: NavItem[];
+  /**
+   * The sections the header's menu links to, in the menu's own order (it need not be the
+   * page's). The rest of nav stays on the page, numbered, but out of the menu. Since Step 3
+   * of the Ashvanta site (2026-11-28) the CV sections are not in the menu.
+   */
+  menu: SectionId[];
   labels: Labels;
   services: Service[];
   pipeline: Pipeline;
@@ -640,16 +676,23 @@ export const profile: Profile = {
   location: "New Delhi, India",
   availability: "Available for projects",
   hero: {
+    badge: "Custom software · AI · BillingRecon",
     greeting: "Hello! I am",
+    founderOf: ", founder of",
     lead: "A developer who",
     statement: "Turns ideas into working",
     highlight: "software",
-    note: "From the database to the UI, with AI built in where it helps.",
-    rolePrefix: "I'm",
-    roles: ["a Full-Stack Developer", "an AI Integrator", "a Software Engineer"],
-    currentLabel: "Currently working as a",
-    primaryAction: "Start a project",
-    secondaryAction: "View projects",
+    note: "Web apps, APIs, integrations and AI features built to order, and BillingRecon, our billing and receivables software for hospitals and clinics in India.",
+    rolePrefix: "We build:",
+    roles: [
+      "web apps and APIs",
+      "AI features with RAG",
+      "hospital billing apps",
+    ],
+    closing:
+      "From a single feature to a complete product: tell us what you need, or ask for a demo of BillingRecon.",
+    primaryAction: "Request a demo",
+    secondaryAction: "See BillingRecon",
     fieldLabels: [
       "RAG",
       ".NET",
@@ -686,10 +729,11 @@ export const profile: Profile = {
     { id: "services", label: "Services", heading: "What I can build" },
     { id: "experience", label: "Experience" },
     { id: "skills", label: "Skills" },
-    { id: "projects", label: "Projects" },
+    { id: "projects", label: "BillingRecon", heading: "Projects" },
     { id: "education", label: "Education", heading: "Education & Certifications" },
     { id: "contact", label: "Contact" },
   ],
+  menu: ["projects", "services", "about", "contact"],
   labels: {
     about: {
       role: "Role",
@@ -725,6 +769,10 @@ export const profile: Profile = {
       links: "Contact links",
       linkedin: "LinkedIn",
       github: "GitHub",
+    },
+    footer: {
+      nav: "Footer",
+      links: ["projects", "contact"],
     },
     palette: {
       open: "Search",

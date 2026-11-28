@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 
 type Props = {
-  /** Skill names drawn beside a few of the points. A phone has room for the first three. */
+  /** Names drawn beside a few of the points (profile.hero.fieldLabels). A phone has room for the first three. */
   labels: string[];
   /** The word drawn beside the travelling query point. */
   queryLabel: string;
@@ -126,11 +126,11 @@ export function HeroField({ labels, queryLabel }: Props) {
     let lit = new Uint8Array(0);
     // The labelled points come first in points; this is how many there are.
     let labelled = 0;
-    // Width in pixels of each skill name and of the query's name, for the overlap test.
+    // Width in pixels of each name and of the query's name, for the overlap test.
     let labelWidths: number[] = [];
     let queryWidth = 0;
     let metricsStale = true;
-    // 0 to 1: how visible the query's name is. It fades while it would cover a skill name.
+    // 0 to 1: how visible the query's name is. It fades while it would cover a name.
     let queryInk = 1;
     let colors = readColors();
     let colorsStale = false;
@@ -272,7 +272,7 @@ export function HeroField({ labels, queryLabel }: Props) {
       metricsStale = false;
     }
 
-    /** True while the query's name would not sit on top of a skill name. */
+    /** True while the query's name would not sit on top of a name. */
     function queryNameIsClear() {
       const nearEdge = query.x > width - 64;
       const left = nearEdge ? query.x - 11 - queryWidth : query.x + 11;
@@ -393,7 +393,7 @@ export function HeroField({ labels, queryLabel }: Props) {
         ctx.fill();
       }
 
-      // The skill names. A lit point's name turns from the muted colour to the text colour.
+      // The names. A lit point's name turns from the muted colour to the text colour.
       ctx.font = `500 12px ${colors.sans}`;
       ctx.textBaseline = "middle";
       ctx.textAlign = "left";

@@ -19,8 +19,15 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useActiveSection } from "@/hooks/use-active-section";
 
-// Computed once at module load so the hook receives the same array on every render.
+// Computed once at module load so the hook receives the same array on every render. The
+// hook watches every section, so the highlight is right wherever the visitor is; only the
+// sections in profile.menu get a link, in the menu's order.
 const sectionIds = profile.nav.map((item) => item.id);
+const menuItems = profile.menu.map((id) => {
+  const item = profile.nav.find((entry) => entry.id === id);
+  if (!item) throw new Error(`profile.menu names "${id}", which is not in profile.nav`);
+  return item;
+});
 
 const labels = profile.labels.header;
 const paletteLabels = profile.labels.palette;
@@ -137,21 +144,21 @@ export function SiteHeader() {
         {/*
           The logo is the link to the top of the site. Its name for screen readers is
           profile.brand.label, which the Logo gives once as hidden text; the drawing and
-          the letters are hidden from them, so the name is not read twice. From md up to
-          lg the seven nav links leave room for the mark alone, so the words are not
-          shown there; the link's name stays. shrink-0 keeps the mark its full size where
-          the header is tightest.
+          the letters are hidden from them, so the name is not read twice. With the four
+          menu links (Step 3, 2026-11-28) the word fits at every width: at 768px there is
+          69px either side of the menu. shrink-0 keeps the mark its full size where the
+          header is tightest.
         */}
         <Link
           href="/"
           onClick={onLogoClick}
           className="flex shrink-0 items-center rounded-md"
         >
-          <Logo labelled animated wordsClassName="md:hidden lg:inline" />
+          <Logo labelled animated />
         </Link>
 
         <nav aria-label={labels.main} className="hidden items-center gap-1 md:flex">
-          {profile.nav.map((item) => (
+          {menuItems.map((item) => (
             <DesktopNavLink
               key={item.id}
               item={item}
@@ -162,9 +169,9 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           {/*
-            From xl only. Below that the header has no room: at 1024px the seven nav
-            links, the logo and this button together make the text wrap. A phone's
-            menu already has Contact. The button always keeps its place, so nothing in the header moves
+            From xl only. It was set when the menu had seven links, which at 1024px left
+            no room for it; with four it may fit from lg, untried. A phone's menu already
+            has Contact. The button always keeps its place, so nothing in the header moves
             when it fades in or out; while it is hidden, inert takes it out of the Tab
             order and away from screen readers and clicks.
           */}
@@ -238,7 +245,7 @@ export function SiteHeader() {
             transition={{ duration: reduce ? 0 : 0.2, ease: "easeOut" }}
           >
             <ul className="flex flex-col px-4 py-2 sm:px-6">
-              {profile.nav.map((item) => {
+              {menuItems.map((item) => {
                 const isActive = active === item.id;
                 return (
                   <li key={item.id}>
