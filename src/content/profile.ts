@@ -149,6 +149,8 @@ export type Labels = {
     roadmap: string;
     /** What a screen reader calls the architecture drawing. */
     diagramTitle: string;
+    /** The words over the modules under the architecture drawing, and their list's name. */
+    modules: string;
   };
   /** The Projects section. */
   projects: {
@@ -517,6 +519,82 @@ export type CaseStudy = {
   roadmap?: Release[];
   /** Any further sections, rendered after the roadmap. */
   sections?: CaseStudySection[];
+  /**
+   * The product page's own parts (Step 5 of the Ashvanta site, 2026-11-28). Each is
+   * optional, and the page renders them in a fixed order: problem, modules, correctness,
+   * security, reporting, operations, architecture, quality, status and roadmap, cta.
+   */
+  /** Where the back link goes and what it says; the homepage's Projects section by default. */
+  back?: { href: string; label: string };
+  /** Every module, with its everyday workflow (an animated strip of steps). */
+  modules?: {
+    heading: string;
+    intro?: string;
+    items: CaseStudyModule[];
+  };
+  /** The money rules in plain words, with the two illustrations. */
+  correctness?: {
+    heading: string;
+    intro?: string;
+    rules: { title: string; text: string }[];
+    ledger?: LedgerDemo;
+    approval?: ApprovalDemo;
+  };
+  security?: CaseStudySection;
+  reporting?: CaseStudySection;
+  operations?: CaseStudySection;
+  /** The modules that run through every layer of the architecture diagram. */
+  architectureModules?: string[];
+  /** How a request travels from the browser to the database: a strip of steps. */
+  delivery?: { heading: string; steps: FlowStep[]; note?: string };
+  /** The technology, one line each. */
+  stack?: { heading: string; bullets: string[] };
+  /** Test numbers with their date and how they were verified, and what is still owed. */
+  quality?: {
+    heading: string;
+    intro?: string;
+    rows: { when: string; what: string; how: string }[];
+    owedHeading: string;
+    owed: string[];
+  };
+  cta?: { heading: string; text: string; action: string; href: string };
+};
+
+/** One step of an animated strip: a short name and a few words under it. */
+export type FlowStep = { name: string; text?: string };
+
+export type CaseStudyModule = {
+  title: string;
+  text: string;
+  /** The everyday workflow, in order: drawn as a strip that lights up step by step. */
+  workflow: FlowStep[];
+  /** A limit said out loud. */
+  note?: string;
+};
+
+/**
+ * The double-entry illustration: documents posted one after another, each writing its
+ * debit and credit lines, the totals equal at every step. The amounts are an example and
+ * the page says so; the account names are BillingRecon's own.
+ */
+export type LedgerDemo = {
+  heading: string;
+  caption: string;
+  /** Column headings: account, debit, credit. */
+  columns: [string, string, string];
+  steps: {
+    document: string;
+    lines: { account: string; debit?: string; credit?: string }[];
+  }[];
+  totalLabel: string;
+  total: string;
+};
+
+/** The maker-checker illustration: who does what, in order, until the posting. */
+export type ApprovalDemo = {
+  heading: string;
+  caption: string;
+  steps: { who: string; what: string }[];
 };
 
 /**
@@ -1025,11 +1103,12 @@ export const profile: Profile = {
       back: "Back to projects",
       technologies: "Technologies",
       contents: "On this page",
-      architecture: "Architecture",
+      architecture: "Technology and architecture",
       principles: "Key principles",
-      status: "Built vs designed",
+      status: "Status",
       roadmap: "Roadmap",
       diagramTitle: "Architecture layers",
+      modules: "The modules, each running through all four layers",
     },
     projects: {
       featured: "Featured project",
@@ -1412,11 +1491,350 @@ export const profile: Profile = {
         statusSummary:
           "Honest status: release 1 and the work after it are built and tested in development; BillingRecon is not yet in use at a hospital. Bank reconciliation, recovery, and insurance and corporate billing are planned.",
         problem: {
-          heading: "The problem",
+          heading: "Overview and the problem it solves",
           paragraphs: [
             "Small clinics, labs and nursing homes bill patients, insurers and corporates, and collect partial or lump-sum payments through cash, card, UPI, cheque, bank transfer and insurer settlements. Over time the balances drift, and money is lost to unallocated payments, untracked dues, duplicate entries and follow-ups that never happen.",
             "BillingRecon records every financial event immutably and keeps balances provably correct today; reconciling them against bank and gateway statements, and driving the recovery of dues, are its next releases.",
+            "BillingRecon is made for a hospital's billing clerks, cashiers, supervisors and administrators, and for read-only viewers such as auditors. Today every payer is the patient or a guarantor; insurers, TPAs and corporate accounts come in release 4.",
           ],
+        },
+        back: { href: "/#product", label: "Back to BillingRecon on the home page" },
+        modules: {
+          heading: "Features in depth",
+          intro:
+            "Twelve modules, all built and tested in development. Each shows its everyday workflow, step by step.",
+          items: [
+            {
+              title: "Patients and payers",
+              text: "Patients are registered with an MRN, and each bill has a payer: the patient, or a guarantor who pays for them. Nobody is ever deleted: a person who leaves is deactivated, and their history stays.",
+              workflow: [
+                { name: "Register", text: "Patient and MRN" },
+                { name: "Payer", text: "The patient or a guarantor" },
+                { name: "Deactivate", text: "Never delete" },
+              ],
+            },
+            {
+              title: "Service catalogue",
+              text: "The hospital's price list: each service with its rate and its tax rate, picked straight into a bill so the same service is always priced the same way.",
+              workflow: [
+                { name: "Add a service", text: "Rate and tax rate" },
+                { name: "Pick it", text: "Into a bill" },
+              ],
+            },
+            {
+              title: "Bills and credit notes",
+              text: "A bill is drafted from the catalogue or from free-text lines, and edited or voided while it is a draft. Posting gives it its number and writes its ledger lines in the same step. After that it is never edited: it is reduced only by a credit note, which a second person approves.",
+              workflow: [
+                { name: "Draft", text: "Catalogue or free text" },
+                { name: "Post", text: "Number and ledger lines" },
+                { name: "Credit note", text: "Approved by a second person" },
+              ],
+            },
+            {
+              title: "Payments and allocation",
+              text: "Cash, card, UPI, bank transfer or cheque. A payment is applied to the payer's bills, oldest first or by hand, and any money not yet applied is kept as unapplied cash and shown in its own report.",
+              workflow: [
+                { name: "Record", text: "Cash, card, UPI, transfer, cheque" },
+                { name: "Allocate", text: "To bills, oldest first" },
+                { name: "Receipt", text: "Printed on the letterhead" },
+              ],
+            },
+            {
+              title: "Refunds, reversals and adjustments",
+              text: "A refund pays back unused money or credit; a reversal undoes a payment, such as a bounced cheque, or an allocation; an adjustment is a discount, a write-off or rounding. Each is a new document that takes effect only after a second, different person approves.",
+              workflow: [
+                { name: "Request", text: "By the maker" },
+                { name: "Approve", text: "By a different checker" },
+                { name: "Post", text: "Its own ledger lines" },
+              ],
+            },
+            {
+              title: "Receivables ledger and reconciliation",
+              text: "Every posting writes balanced double-entry lines in the same step as its document. Quick balances (a bill's balance due, a payment's unapplied cash, a payer's balance) are kept beside the ledger, and a reconciliation recomputes them from the ledger and reports any difference.",
+              workflow: [
+                { name: "Post", text: "Debits equal credits" },
+                { name: "Keep", text: "Balances beside the ledger" },
+                { name: "Reconcile", text: "Every hospital, every night" },
+              ],
+            },
+            {
+              title: "Dashboard and reports",
+              text: "Figures for a period, taken from the ledger by business date and compared with the period before; the ageing of dues; and eight reports, each with filters, sortable columns and a CSV export that matches the server's totals.",
+              workflow: [
+                { name: "Choose a period", text: "Or a filter" },
+                { name: "Read", text: "Figures from the ledger" },
+                { name: "Export", text: "CSV, totals included" },
+              ],
+            },
+            {
+              title: "Printing on letterhead",
+              text: "Bills, receipts and refund vouchers on the hospital's letterhead with its logo and signature, the CGST and SGST split and the amount in words in lakh and crore, on A4, A5 or an 80 mm roll. The first print is the Original; every later one says Duplicate.",
+              workflow: [
+                { name: "Set up", text: "Letterhead, logo, signature" },
+                { name: "Print", text: "A4, A5 or 80 mm" },
+                { name: "Reprint", text: "Marked Duplicate" },
+              ],
+              note: "Printing is done by the browser; whether the printed tax wording meets the law is for the hospital's chartered accountant to confirm.",
+            },
+            {
+              title: "Cashier shift and day-end",
+              text: "A cashier opens a shift with a float and takes cash only inside their own open shift. Closing is a count by Indian denominations; a difference is recorded, never posted, and approved by someone other than the cashier. The day-end report and a printable closing slip follow.",
+              workflow: [
+                { name: "Open", text: "With a float" },
+                { name: "Take cash", text: "In your own shift" },
+                { name: "Count", text: "By denomination" },
+                { name: "Close", text: "A difference is approved" },
+              ],
+            },
+            {
+              title: "Accountant's export for Tally",
+              text: "One balanced voucher for each ledger posting (Receipt, Payment or Journal), in Tally's XML format, using the twelve ledger names the hospital has set. A missing name refuses the file, and one file covers at most 92 days.",
+              workflow: [
+                { name: "Name", text: "The twelve ledgers" },
+                { name: "Choose", text: "Up to 92 days" },
+                { name: "Download", text: "Tally XML" },
+              ],
+              note: "The format was checked against Tally's documentation; the file has not yet been tried in Tally itself.",
+            },
+            {
+              title: "Users, roles and two-step sign-in",
+              text: "Five roles: administrator, supervisor, billing clerk, cashier and viewer. A new user sets their own password at first sign-in; administrators and supervisors also give a code from an authenticator app; and signing out ends every session of that user.",
+              workflow: [
+                { name: "Create", text: "A user and their roles" },
+                { name: "First sign-in", text: "Set their own password" },
+                { name: "Second step", text: "Authenticator code" },
+              ],
+            },
+            {
+              title: "Import and onboarding",
+              text: "A new hospital is added by the operator. Its patients and guarantors come in from a file, matched by MRN with a dry run first, and its opening balances come in as one batch that a second person approves.",
+              workflow: [
+                { name: "Add the hospital", text: "By the operator" },
+                { name: "Import", text: "Dry run, matched by MRN" },
+                { name: "Opening balances", text: "Approved by a second person" },
+              ],
+              note: "So far tried on a sample hospital's data only.",
+            },
+          ],
+        },
+        correctness: {
+          heading: "Financial correctness",
+          intro:
+            "The rules every part of BillingRecon follows, in plain words. All of them are built and covered by tests.",
+          rules: [
+            {
+              title: "Money is exact",
+              text: "Amounts are exact decimals in rupees and paise, never floating point; each line is rounded once and a total is the sum of the rounded lines.",
+            },
+            {
+              title: "Nothing posted is ever changed",
+              text: "A posted bill, credit note, payment, adjustment, refund or ledger line never changes; a mistake is put right by a new document.",
+            },
+            {
+              title: "Document and ledger together",
+              text: "A financial document and its balanced ledger lines are saved together, or not at all.",
+            },
+            {
+              title: "Balances are checked",
+              text: "Quick balances are kept beside the ledger, and a reconciliation recomputes them from it and reports any difference.",
+            },
+            {
+              title: "No double posting on retry",
+              text: "Every request that records money carries a unique key; sending it again returns the first answer instead of a second payment.",
+            },
+            {
+              title: "No lost updates",
+              text: "A save from an out-of-date screen is refused, and the user is told what changed.",
+            },
+            {
+              title: "Numbers without gaps",
+              text: "Document numbers run without gaps per hospital, document type and Indian financial year, as in BIL/26-27/000123.",
+            },
+            {
+              title: "Indian business dates",
+              text: "Bills and payments carry business dates in India time; every timestamp is stored in UTC.",
+            },
+            {
+              title: "Maker-checker",
+              text: "Reversals, adjustments, credit notes, refunds, large bills and a shift closed with a difference wait for a second person, who cannot be their author.",
+            },
+            {
+              title: "No hard deletes",
+              text: "Financial records are never deleted; the application's own database login has no right to delete them.",
+            },
+            {
+              title: "An audit trail that only grows",
+              text: "Every change to a financial or security record writes who, when, and what before and after, and the trail cannot be edited.",
+            },
+            {
+              title: "Hospitals kept apart",
+              text: "The hospital comes only from the signed-in user, and every query is filtered by it.",
+            },
+          ],
+          ledger: {
+            heading: "Double entry, step by step",
+            caption:
+              "An example with sample amounts: a bill is posted, a payment is recorded, and the payment is applied to the bill. Every step writes equal debits and credits, so the ledger always balances.",
+            columns: ["Account", "Debit (₹)", "Credit (₹)"],
+            steps: [
+              {
+                document: "Bill BIL/26-27/000123 posted",
+                lines: [
+                  { account: "Receivable", debit: "1,200.00" },
+                  { account: "Revenue", credit: "1,200.00" },
+                ],
+              },
+              {
+                document: "Payment PAY/26-27/000045 recorded",
+                lines: [
+                  { account: "Cash", debit: "1,200.00" },
+                  { account: "Unapplied cash", credit: "1,200.00" },
+                ],
+              },
+              {
+                document: "Payment allocated to the bill",
+                lines: [
+                  { account: "Unapplied cash", debit: "1,200.00" },
+                  { account: "Receivable", credit: "1,200.00" },
+                ],
+              },
+            ],
+            totalLabel: "Debits = credits",
+            total: "3,600.00",
+          },
+          approval: {
+            heading: "Maker-checker, step by step",
+            caption:
+              "An example: a refund takes effect only when a second, different person approves it.",
+            steps: [
+              { who: "Cashier", what: "Requests a refund of ₹500" },
+              { who: "BillingRecon", what: "Holds it as waiting; nothing is posted" },
+              { who: "Supervisor", what: "Reviews and approves" },
+              { who: "BillingRecon", what: "Posts the refund and its ledger lines" },
+            ],
+          },
+        },
+        security: {
+          heading: "Security and access",
+          bullets: [
+            "Five roles and a permission for each capability, refused unless granted; a test walks every endpoint with every role.",
+            "Passwords are hashed with PBKDF2-HMAC-SHA-256 at 600,000 iterations; sign-in is limited to 30 tries a minute per address, and an account is held for 15 minutes after 10 refusals.",
+            "A two-step sign-in for administrators and supervisors: a code from an authenticator app, ten recovery codes, the secret encrypted with AES-256-GCM. No phone has yet read its enrolment QR code in a test.",
+            "A forgotten password is reset by a one-time link by mail, where the hospital has a mail server; no mail has yet gone to a real mail server.",
+            "Signing out ends every session of the user on the server, and a new or reset user must choose their own password.",
+            "An append-only audit trail of every change to money and security, readable by whoever may read the record.",
+            "An independent read-only review on 26 November 2026 found 14 issues (no critical, 2 high, 4 medium, 8 low); of the ten chosen for action, eight were fixed and two accepted with their risk recorded. It was a review, not a penetration test.",
+          ],
+        },
+        reporting: {
+          heading: "Reports, dashboard, printing and Tally",
+          bullets: [
+            "Eight reports: the bill register, the payment register, daily collection, outstanding by payer, unapplied cash, available credit, pending approvals and the reconciliation; each with filters, sortable columns, a choice of columns, and a CSV export that matches the server's totals.",
+            "A day-end report for the cashier's counter, equal to the daily collection's cash.",
+            "A dashboard of period figures from the ledger by business date, compared with the previous period, with the ageing of dues; every figure has a tooltip and every chart a table.",
+            "Printing on the hospital's letterhead (ten fields, logo and signature), with SAC codes, Tax Invoice or Bill of Supply titles, the CGST and SGST split and the amount in words; Original on the first print, Duplicate after.",
+            "An accountant's export in Tally's XML format, one balanced voucher per ledger posting; not yet tried in Tally itself.",
+          ],
+        },
+        operations: {
+          heading: "Operations",
+          bullets: [
+            "Onboarding: the operator adds, suspends or resumes a hospital with a command; patients, guarantors and opening balances come in by import, with a dry run and a second person's approval.",
+            "Every night at 02:00 India time a reconciliation checks every hospital, and one alert mail names any hospital whose balances drifted; no alert has yet reached a real mailbox.",
+            "A daily job removes expired retry keys.",
+            "A watchdog script checks health, errors, disks, the transaction log, the last backup and the certificate, and mails once a day per problem; it has not yet run on a server.",
+            "Backup scripts (a full backup with a checksum, and a restore under another name) ran on Docker on 24 November 2026. The production design, one Linux server with an encrypted database, nightly full and 15-minute log backups and a monthly restore drill, is written as files and has not run yet.",
+          ],
+        },
+        architectureModules: [
+          "Common",
+          "Payers",
+          "Billing",
+          "Payments",
+          "Receivables",
+          "Adjustments",
+          "Reporting",
+          "Identity",
+          "Audit",
+        ],
+        delivery: {
+          heading: "From the browser to the database",
+          steps: [
+            { name: "Browser", text: "React app" },
+            { name: "nginx", text: "HTTPS, the app's files" },
+            { name: "API", text: "ASP.NET Core, /api/v1" },
+            { name: "SQL Server", text: "One database" },
+          ],
+          note: "Logs go to Seq. The whole stack runs with Docker Compose.",
+        },
+        stack: {
+          heading: "Technology",
+          bullets: [
+            ".NET 10 and ASP.NET Core: one API under /api/v1, errors as RFC 9457 problem details, OpenAPI.",
+            "EF Core 10 on SQL Server (2022 in Docker for tests and deployment); FluentValidation; Serilog to Seq, with phone numbers and e-mail addresses masked.",
+            "React 19 and TypeScript with Vite, React Router, TanStack Query and Table, React Hook Form and Recharts; its own components on design tokens, in light and dark themes.",
+            "xUnit, Shouldly, Testcontainers, NetArchTest and Bogus; Vitest and React Testing Library; Playwright with axe for the browser.",
+            "Docker Compose for the whole stack: SQL Server, Seq, the migrations, the API and nginx with HTTPS.",
+            "Every design decision recorded: architecture decision records 0000 to 0063.",
+            "Deliberately not used: MediatR, AutoMapper, microservices, message brokers.",
+          ],
+        },
+        quality: {
+          heading: "Quality",
+          intro:
+            "The test results, each with its date and how it was run. What is still owed is listed under them.",
+          rows: [
+            {
+              when: "24 Nov 2026",
+              what: "Domain 652, Application 431 and Architecture 132 tests passed; 1,277 of 1,280 integration tests passed on SQL Server 2022. The three timing tests that failed were fixed afterwards.",
+              how: "Personal machine, .NET 10, SQL Server 2022 in Docker",
+            },
+            {
+              when: "24 Nov 2026",
+              what: "Concurrency tests, three rounds of 291, all passed.",
+              how: "Personal machine, SQL Server 2022",
+            },
+            {
+              when: "24 Nov 2026",
+              what: "261 browser tests: 48 screens in both themes at 1440 and 390 px, with no serious or critical accessibility finding by axe (WCAG 2.2 A and AA).",
+              how: "Office machine, Edge, against the built app",
+            },
+            {
+              when: "24 Nov 2026",
+              what: "Load test, 50 users: posting a bill p95 107.6 ms, recording a payment p95 102.9 ms, no errors and no drift.",
+              how: "Office machine, LocalDB, 2,000 bills",
+            },
+            {
+              when: "27 Nov 2026",
+              what: "List filters on 100,000 bills: the slowest query took 179 ms.",
+              how: "Office machine, LocalDB",
+            },
+            {
+              when: "28 Nov 2026",
+              what: "724 front-end component tests passed, and 388 of 389 browser tests (the one failure, a timing test, passed when run again).",
+              how: "Office machine, Edge, against the built app",
+            },
+            {
+              when: "Always",
+              what: "33 user stories, each traced to the tests that prove it; a test fails the build if one is missing.",
+              how: "Every build",
+            },
+          ],
+          owedHeading: "Still to be run",
+          owed: [
+            "The database tests of the later work on SQL Server 2022 (so far on LocalDB).",
+            "The 10,000-bill load test on SQL Server 2022.",
+            "A confirmed passing run of the CI workflow on GitHub.",
+            "A deployment on a server, with its watchdog, alerts and backups.",
+            "A phone reading the two-step QR code, a mail to a real mail server, and an import into Tally.",
+            "A penetration test.",
+          ],
+        },
+        cta: {
+          heading: "See BillingRecon for your hospital",
+          text: "Ask for a demo and we will walk you through the screens with sample data, and answer what you need to know.",
+          action: "Request a demo",
+          href: "/#contact",
         },
         architecture: {
           layers: [
@@ -1445,44 +1863,6 @@ export const profile: Profile = {
             "Every request carries a correlation id that appears on each log line and error response, and logs are structured JSON with personal data masked before it is written.",
           ],
         },
-        principles: [
-          {
-            name: "Decimal money",
-            status: "Built",
-            summary:
-              "Amounts are exact decimals, never floating point. Rounding happens once, at line level, and a total is the sum of the rounded lines, so paise never disappear silently.",
-          },
-          {
-            name: "Immutable records",
-            status: "Built",
-            summary:
-              "Posted financial records are never updated or deleted. A correction is a new record, such as a reversal, a credit note or an adjustment, and each one writes its own ledger entry in the same database transaction.",
-          },
-          {
-            name: "Idempotency",
-            status: "Built",
-            summary:
-              "Every request that moves money carries an Idempotency-Key. A replayed request returns the stored response instead of creating a second payment, which is what makes retries safe.",
-          },
-          {
-            name: "Concurrency control",
-            status: "Built",
-            summary:
-              "Every table carries a row version. The API returns it as an ETag and requires If-Match on updates, so two people editing the same bill get a 409 Conflict instead of a silent lost update.",
-          },
-          {
-            name: "Gapless numbering",
-            status: "Built",
-            summary:
-              "Bill, payment, credit note, adjustment and refund numbers come from a number series per hospital, document type and Indian financial year, with no gaps: a failed posting gives its number back.",
-          },
-          {
-            name: "Maker-checker",
-            status: "Built",
-            summary:
-              "Reversals, adjustments, credit notes, refunds and bills above a hospital's threshold take effect only when a second person approves them, and neither the requester nor the document's author can approve.",
-          },
-        ],
         statusTable: [
           {
             area: "Engineering foundation: layout, architecture tests, logging with PII masking, error contract, tenant isolation",
@@ -1538,15 +1918,6 @@ export const profile: Profile = {
           },
         ],
         roadmap: billingReconReleases,
-        sections: [
-          {
-            heading: "Testing approach",
-            paragraphs: [
-              "Unit tests use xUnit with Shouldly, architecture tests guard the layer boundaries, integration tests run against SQL Server 2022 in Docker through Testcontainers, and browser tests use Playwright with axe accessibility checks. The EF in-memory provider is deliberately avoided because it does not enforce constraints or transactions.",
-              "On 24 November 2026 the backend ran on .NET 10 and SQL Server 2022: 1,277 of 1,280 integration tests passed, and the three timing tests that failed were fixed afterwards. The database tests of later work have so far run on LocalDB, and the CI workflow has not yet run on GitHub.",
-            ],
-          },
-        ],
       },
     },
     {

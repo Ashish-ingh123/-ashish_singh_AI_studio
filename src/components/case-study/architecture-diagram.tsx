@@ -214,7 +214,22 @@ function NarrowDiagram({ layers, rule, title, id }: Props & { id: string }) {
  * motion is CSS (src/app/styles/case-study.css) hanging off data-seen, which SeenList
  * changes; under reduced motion, and without script, the drawing is simply complete.
  */
-export function ArchitectureDiagram({ layers, rule, title }: Props) {
+export function ArchitectureDiagram({
+  layers,
+  rule,
+  title,
+  modules,
+  modulesLabel,
+}: Props & {
+  /**
+   * The modules that run through every layer (Step 5 of the Ashvanta site, 2026-11-28):
+   * a row of chips under the drawing, which appear one after another once the layers
+   * are drawn, as part of the same figure.
+   */
+  modules?: string[];
+  /** The words before the chips, and the list's name for a screen reader. */
+  modulesLabel?: string;
+}) {
   return (
     <SeenList as="div">
       <figure
@@ -232,6 +247,30 @@ export function ArchitectureDiagram({ layers, rule, title }: Props) {
             id="arch-narrow"
           />
         </div>
+        {modules && modules.length > 0 && (
+          <div className="mt-4 border-t border-border pt-4">
+            {modulesLabel && (
+              <p
+                className="arch-layer text-sm font-medium"
+                style={place(layers.length)}
+              >
+                {modulesLabel}
+              </p>
+            )}
+            <ul aria-label={modulesLabel} className="mt-2 flex flex-wrap gap-2">
+              {modules.map((name, index) => (
+                <li
+                  key={name}
+                  className="arch-layer rounded-full border border-accent/40 bg-accent/10 px-3 py-1 font-mono text-xs text-accent"
+                  // After the last layer, the chips follow three to each step of the drawing.
+                  style={place(layers.length + (index + 1) / 3)}
+                >
+                  {name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <figcaption className="mt-4 text-sm leading-relaxed text-muted-foreground">
           {rule}
         </figcaption>

@@ -56,3 +56,69 @@
     transition: none;
   }
 }
+
+/*
+  The product page's sequences (Step 5 of the Ashvanta site, 2026-11-28): the workflow
+  strips (flow-strip.tsx), the ledger table (ledger-demo.tsx) and the maker-checker steps
+  (approval-demo.tsx). The same armed-and-seen pattern as the diagram above: an element
+  with class "seq" carries data-seen; each of its .seq-item parts carries --i and appears
+  --i times --step after the sequence is seen, with opacity and transform only. A strip's
+  joining lines (.flow-link) draw themselves just after the step they leave from.
+
+  The joining line runs down to the next step on a phone (the strip is a column, gap-3)
+  and to the right from sm (a row, gap-6). It is decoration: aria-hidden in the markup.
+*/
+
+.flow-link {
+  position: absolute;
+  left: 1.5rem;
+  top: 100%;
+  width: 2px;
+  height: 0.75rem;
+  background: var(--accent);
+  opacity: 0.55;
+  transform-origin: top;
+}
+
+@media (min-width: 40rem) {
+  .flow-link {
+    left: 100%;
+    top: 50%;
+    width: 1.5rem;
+    height: 2px;
+    transform-origin: left;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .seq {
+    --step: 0.3s;
+  }
+
+  .seq-item {
+    transition:
+      opacity 0.3s ease-out,
+      transform 0.3s ease-out;
+    transition-delay: calc(var(--i) * var(--step));
+  }
+
+  .seq .flow-link {
+    transition: transform 0.25s ease-out;
+    transition-delay: calc(var(--i) * var(--step) + 0.2s);
+  }
+
+  .seq[data-armed="true"][data-seen="false"] .seq-item {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .seq[data-armed="true"][data-seen="false"] .flow-link {
+    transform: scale(0);
+  }
+
+  /* Hidden again in an instant, should it ever be needed: only the showing is slow. */
+  .seq[data-seen="false"] .seq-item,
+  .seq[data-seen="false"] .flow-link {
+    transition: none;
+  }
+}
