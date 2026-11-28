@@ -99,6 +99,19 @@ export type Labels = {
     github: string;
   };
   /**
+   * The screenshots' full-size viewer (Step 6 of the Ashvanta site): the words of its
+   * buttons. {alt}, {n} and {total} are filled in by the component.
+   */
+  screens: {
+    /** The name of a screenshot's button: "Open full size: {alt}". */
+    open: string;
+    close: string;
+    previous: string;
+    next: string;
+    /** "{n} of {total}", read out and shown in the viewer. */
+    counter: string;
+  };
+  /**
    * The footer. Its links are the sections named in `links`, with their menu labels; the
    * phone number is never among them (rule 5).
    */
@@ -526,6 +539,12 @@ export type CaseStudy = {
    */
   /** Where the back link goes and what it says; the homepage's Projects section by default. */
   back?: { href: string; label: string };
+  /**
+   * true shows the "Screens" gallery after the modules: every screenshot of
+   * profile.product.screenshots, with its heading and intro. It also gives the page's
+   * full-size viewer every screenshot, so the modules' screenshots open in it too.
+   */
+  gallery?: boolean;
   /** Every module, with its everyday workflow (an animated strip of steps). */
   modules?: {
     heading: string;
@@ -570,6 +589,28 @@ export type CaseStudyModule = {
   workflow: FlowStep[];
   /** A limit said out loud. */
   note?: string;
+  /** Screenshots shown beside the module, by id in profile.product.screenshots. */
+  shots?: string[];
+};
+
+/**
+ * A real BillingRecon screen (Step 6 of the Ashvanta site, 2026-11-28), from BillingRecon's
+ * docs/ui, cropped and converted to WebP by scripts/billingrecon-shots.mjs into
+ * public/images/billingrecon. Sample data only: the browser tests' invented hospital and
+ * patients. width and height are the file's own, as the script prints them.
+ */
+export type Screenshot = {
+  id: string;
+  /** The file's name without "-dark" and ".webp". */
+  file: string;
+  width: number;
+  height: number;
+  /** A dark-theme file exists (file-dark.webp), shown in the dark theme. */
+  dark: boolean;
+  /** What the screen shows, for a screen reader and for search engines. */
+  alt: string;
+  /** The line under the screenshot. */
+  caption: string;
 };
 
 /**
@@ -695,6 +736,13 @@ export type Product = {
   /** The heading over the releases. */
   releasesHeading: string;
   releases: Release[];
+  /** Every screenshot, in the gallery's order. */
+  screenshots: Screenshot[];
+  /** The one screenshot on the homepage's BillingRecon section, by id. */
+  homeShot: string;
+  /** The gallery on the product page: its heading and intro. */
+  screensHeading: string;
+  screensIntro: string;
 };
 
 export type Education = {
@@ -1013,6 +1061,129 @@ export const profile: Profile = {
     ],
     releasesHeading: "Releases",
     releases: billingReconReleases,
+    homeShot: "dashboard",
+    screensHeading: "Screens",
+    screensIntro:
+      "Real BillingRecon screens with the sample data of its tests: an invented hospital and invented patients. Open any of them to see it full size.",
+    screenshots: [
+      {
+        id: "dashboard",
+        file: "dashboard-built",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "BillingRecon's dashboard: six figure cards (total billing, amount collected, outstanding dues, unapplied cash, pending approvals, reconciliation issues), a chart of billing against collections and the ageing of dues, with sample data.",
+        caption: "The dashboard: the period's figures from the ledger, compared with the period before.",
+      },
+      {
+        id: "bill-editor",
+        file: "bill-editor",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "Editing a draft bill: the patient and payer, the bill and due dates, the encounter reference, the first lines with quantity, unit price and discount, and an estimate of the totals.",
+        caption: "Drafting a bill, with an estimate of the totals as you type.",
+      },
+      {
+        id: "bill-posted",
+        file: "bill-posted",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "A posted bill, BIL/26-27/000123, partly paid: its patient, payer and dates, its two lines with tax, and the totals with the balance due; buttons to draft a credit note or an adjustment and to print.",
+        caption: "A posted bill: its number, its lines and what is still due.",
+      },
+      {
+        id: "allocating",
+        file: "allocating",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "Allocating payment PAY/26-27/000001 to two bills of the same payer, with an Apply oldest first button and a meter showing ₹1,500.00 of unapplied cash fully allocated.",
+        caption: "Applying a payment to the payer's bills, oldest first or by hand.",
+      },
+      {
+        id: "inbox",
+        file: "inbox",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "The approvals inbox: three requests waiting for a second person (a bill above the threshold, a refund and a payment reversal), each with its payer, amount, maker and reason; the checker's own request cannot be reviewed by them.",
+        caption: "Maker-checker: what waits for a second person, oldest first.",
+      },
+      {
+        id: "statement",
+        file: "statement",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "A payer's statement: what is owed on bills, unapplied cash, available credit and the net outstanding, then the outstanding bills, the payments with unapplied cash and the credit notes with available credit.",
+        caption: "A payer's statement, as the ledger has it now.",
+      },
+      {
+        id: "printed",
+        file: "bill-printed-letterhead",
+        width: 1200,
+        height: 1335,
+        dark: true,
+        alt: "A tax invoice printed on a sample hospital's letterhead: its logo, address and GSTIN, the bill's lines with SAC, CGST and SGST, the totals, the amount in words and the signatory, marked Original.",
+        caption: "A bill on the hospital's letterhead, marked Original on its first print.",
+      },
+      {
+        id: "shift-close",
+        file: "shift-close",
+        width: 1440,
+        height: 900,
+        dark: false,
+        alt: "Closing a cashier's shift: the count of the drawer by note and coin, from ₹2000 down to ₹1, with the amount of each.",
+        caption: "Closing a shift with a count of the drawer by denomination.",
+      },
+      {
+        id: "accounting-export",
+        file: "accounting-export",
+        width: 1440,
+        height: 900,
+        dark: false,
+        alt: "The accountant's export: a period, the button to download the Tally file, a warning that one ledger has no name in the books yet, and the ledgers with their debits and credits, which balance.",
+        caption: "The accountant's export for Tally, refusing the file until every ledger is named.",
+      },
+      {
+        id: "report-bills",
+        file: "report-bills",
+        width: 1440,
+        height: 900,
+        dark: true,
+        alt: "The bill register report: a period, filters by payer, status and total, sortable columns, a Columns button and Export CSV, with one bill and its totals.",
+        caption: "A report with its filters, sortable columns and CSV export.",
+      },
+      {
+        id: "users",
+        file: "users",
+        width: 1440,
+        height: 900,
+        dark: false,
+        alt: "Users and settings: tabs for users, settings, print, import and accounts, filters, and a list of users with their roles and status.",
+        caption: "Users and their roles, where the administrator manages them.",
+      },
+      {
+        id: "second-step",
+        file: "second-step-enrol",
+        width: 1440,
+        height: 900,
+        dark: false,
+        alt: "Setting up the second step of sign-in: three steps to install an authenticator app, scan the QR code and give its six digits, with a Begin button.",
+        caption: "Two-step sign-in for administrators and supervisors.",
+      },
+      {
+        id: "dashboard-phone",
+        file: "dashboard-built-phone",
+        width: 390,
+        height: 1266,
+        dark: true,
+        alt: "BillingRecon's dashboard on a phone: the figure cards stacked one under another, with sample data.",
+        caption: "The same dashboard on a phone.",
+      },
+    ],
   },
   summary:
     "Software Engineer building production software across the stack with C#, .NET, SQL Server, AngularJS and React, with experience in Docker, Redis and AWS. In my current role I develop and maintain a large healthcare ERP: billing workflows, payment and fiscal e-invoicing integrations, WhatsApp messaging, scheduled reporting and production debugging. I am also available for projects, from full-stack web apps and APIs to containerised microservices, cloud deployments on AWS, and AI features built on retrieval-augmented generation (RAG) and LLMs.",
@@ -1078,6 +1249,13 @@ export const profile: Profile = {
       links: "Contact links",
       linkedin: "LinkedIn",
       github: "GitHub",
+    },
+    screens: {
+      open: "Open full size: {alt}",
+      close: "Close",
+      previous: "Previous screen",
+      next: "Next screen",
+      counter: "{n} of {total}",
     },
     footer: {
       nav: "Footer",
@@ -1499,6 +1677,7 @@ export const profile: Profile = {
           ],
         },
         back: { href: "/#product", label: "Back to BillingRecon on the home page" },
+        gallery: true,
         modules: {
           heading: "Features in depth",
           intro:
@@ -1523,6 +1702,7 @@ export const profile: Profile = {
             },
             {
               title: "Bills and credit notes",
+              shots: ["bill-editor", "bill-posted"],
               text: "A bill is drafted from the catalogue or from free-text lines, and edited or voided while it is a draft. Posting gives it its number and writes its ledger lines in the same step. After that it is never edited: it is reduced only by a credit note, which a second person approves.",
               workflow: [
                 { name: "Draft", text: "Catalogue or free text" },
@@ -1532,6 +1712,7 @@ export const profile: Profile = {
             },
             {
               title: "Payments and allocation",
+              shots: ["allocating"],
               text: "Cash, card, UPI, bank transfer or cheque. A payment is applied to the payer's bills, oldest first or by hand, and any money not yet applied is kept as unapplied cash and shown in its own report.",
               workflow: [
                 { name: "Record", text: "Cash, card, UPI, transfer, cheque" },
@@ -1541,6 +1722,7 @@ export const profile: Profile = {
             },
             {
               title: "Refunds, reversals and adjustments",
+              shots: ["inbox"],
               text: "A refund pays back unused money or credit; a reversal undoes a payment, such as a bounced cheque, or an allocation; an adjustment is a discount, a write-off or rounding. Each is a new document that takes effect only after a second, different person approves.",
               workflow: [
                 { name: "Request", text: "By the maker" },
@@ -1550,6 +1732,7 @@ export const profile: Profile = {
             },
             {
               title: "Receivables ledger and reconciliation",
+              shots: ["statement"],
               text: "Every posting writes balanced double-entry lines in the same step as its document. Quick balances (a bill's balance due, a payment's unapplied cash, a payer's balance) are kept beside the ledger, and a reconciliation recomputes them from the ledger and reports any difference.",
               workflow: [
                 { name: "Post", text: "Debits equal credits" },
@@ -1559,6 +1742,7 @@ export const profile: Profile = {
             },
             {
               title: "Dashboard and reports",
+              shots: ["dashboard", "report-bills"],
               text: "Figures for a period, taken from the ledger by business date and compared with the period before; the ageing of dues; and eight reports, each with filters, sortable columns and a CSV export that matches the server's totals.",
               workflow: [
                 { name: "Choose a period", text: "Or a filter" },
@@ -1568,6 +1752,7 @@ export const profile: Profile = {
             },
             {
               title: "Printing on letterhead",
+              shots: ["printed"],
               text: "Bills, receipts and refund vouchers on the hospital's letterhead with its logo and signature, the CGST and SGST split and the amount in words in lakh and crore, on A4, A5 or an 80 mm roll. The first print is the Original; every later one says Duplicate.",
               workflow: [
                 { name: "Set up", text: "Letterhead, logo, signature" },
@@ -1578,6 +1763,7 @@ export const profile: Profile = {
             },
             {
               title: "Cashier shift and day-end",
+              shots: ["shift-close"],
               text: "A cashier opens a shift with a float and takes cash only inside their own open shift. Closing is a count by Indian denominations; a difference is recorded, never posted, and approved by someone other than the cashier. The day-end report and a printable closing slip follow.",
               workflow: [
                 { name: "Open", text: "With a float" },
@@ -1588,6 +1774,7 @@ export const profile: Profile = {
             },
             {
               title: "Accountant's export for Tally",
+              shots: ["accounting-export"],
               text: "One balanced voucher for each ledger posting (Receipt, Payment or Journal), in Tally's XML format, using the twelve ledger names the hospital has set. A missing name refuses the file, and one file covers at most 92 days.",
               workflow: [
                 { name: "Name", text: "The twelve ledgers" },
@@ -1598,6 +1785,7 @@ export const profile: Profile = {
             },
             {
               title: "Users, roles and two-step sign-in",
+              shots: ["users", "second-step"],
               text: "Five roles: administrator, supervisor, billing clerk, cashier and viewer. A new user sets their own password at first sign-in; administrators and supervisors also give a code from an authenticator app; and signing out ends every session of that user.",
               workflow: [
                 { name: "Create", text: "A user and their roles" },

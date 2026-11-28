@@ -1,0 +1,30 @@
+/*
+  Styles for the screenshots' full-size viewer (screenshot-viewer.tsx, Step 6 of the
+  Ashvanta site). Imported by globals.css. Use the design tokens, never raw colours.
+
+  A native modal <dialog>, like the command palette (palette.css): the browser puts it in
+  the top layer with a ::backdrop. Tailwind removes the browser's centring of dialogs, so
+  the position and size are set here. Nothing animates.
+*/
+
+@layer components {
+  .screenshot-viewer {
+    width: min(78rem, calc(100vw - 1rem));
+    max-height: 92dvh;
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--card-edge);
+    border-radius: 1rem;
+    background: var(--card);
+    color: var(--foreground);
+    box-shadow: 0 30px 80px -20px var(--glow);
+  }
+
+  .screenshot-viewer::backdrop {
+    background: color-mix(in oklab, var(--background) 82%, transparent);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+}

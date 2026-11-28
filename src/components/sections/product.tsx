@@ -2,8 +2,11 @@ import { ArrowRight, Check } from "lucide-react";
 import { ButtonLink } from "@/components/button-link";
 import { cardClasses } from "@/components/card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
+import { Shot } from "@/components/screenshot";
+import { ScreenshotViewer } from "@/components/screenshot-viewer";
 import { Section } from "@/components/section";
 import { profile } from "@/content/profile";
+import { findShot } from "@/lib/screenshots";
 
 /**
  * BillingRecon, the company's product (Step 4 of the Ashvanta site, 2026-11-28): what it
@@ -13,6 +16,7 @@ import { profile } from "@/content/profile";
  */
 export function Product() {
   const { product, hero } = profile;
+  const homeShot = findShot(product.homeShot);
 
   return (
     <Section id="product" intro={product.intro}>
@@ -74,6 +78,12 @@ export function Product() {
           </RevealGroup>
         </div>
       </div>
+
+      {/* One real screen of the product under the promises (Step 6); it opens full size. */}
+      <Reveal className="mt-12">
+        <Shot shot={homeShot} sizes="(min-width: 1152px) 1104px, 92vw" />
+      </Reveal>
+      <ScreenshotViewer shots={[homeShot]} />
     </Section>
   );
 }

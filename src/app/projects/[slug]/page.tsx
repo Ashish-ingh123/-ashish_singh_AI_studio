@@ -13,6 +13,9 @@ import { Principles } from "@/components/case-study/principles";
 import { Roadmap } from "@/components/case-study/roadmap";
 import { StatusTable } from "@/components/case-study/status-table";
 import { Chip } from "@/components/chip";
+import { Shot } from "@/components/screenshot";
+import { ScreenshotViewer } from "@/components/screenshot-viewer";
+import { findShot } from "@/lib/screenshots";
 import { StatusBadge } from "@/components/status-badge";
 import { profile, type CaseStudySection } from "@/content/profile";
 import { caseStudies, caseStudyPath, findCaseStudy } from "@/lib/case-studies";
@@ -116,6 +119,9 @@ export default async function ProjectPage({ params }: Props) {
   const study = project.caseStudy;
   const labels = profile.labels.caseStudy;
   const back = study.back ?? { href: "/#projects", label: labels.back };
+  const { product } = profile;
+  // Every screenshot the full-size viewer can show, in the gallery's order (Step 6).
+  const viewerShots = study.gallery ? product.screenshots : [];
 
   // The page's sections in the order they are rendered below, for the contents list (the
   // order of Step 5 of the Ashvanta site, 2026-11-28). A part the case study leaves out is
@@ -123,6 +129,7 @@ export default async function ProjectPage({ params }: Props) {
   const headings = [
     study.problem?.heading,
     study.modules?.heading,
+    study.gallery && product.screensHeading,
     study.correctness?.heading,
     study.principles && labels.principles,
     study.security?.heading,
@@ -249,9 +256,40 @@ export default async function ProjectPage({ params }: Props) {
                     {module.note}
                   </p>
                 )}
+                {module.shots && module.shots.length > 0 && (
+                  <div
+                    className={`mt-5 grid gap-4 ${module.shots.length > 1 ? "sm:grid-cols-2" : ""}`}
+                  >
+                    {module.shots.map((id) => (
+                      <Shot
+                        key={id}
+                        shot={findShot(id)}
+                        sizes={
+                          module.shots && module.shots.length > 1
+                            ? "(min-width: 640px) 360px, 92vw"
+                            : "(min-width: 768px) 720px, 92vw"
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
               </section>
             ))}
           </div>
+        </Part>
+      )}
+
+      {/* Every screenshot in one place, two to a row from sm (Step 6). */}
+      {study.gallery && (
+        <Part heading={product.screensHeading}>
+          <p className="leading-relaxed text-muted-foreground">{product.screensIntro}</p>
+          <ul className="mt-6 grid gap-6 sm:grid-cols-2">
+            {product.screenshots.map((shot) => (
+              <li key={shot.id}>
+                <Shot shot={shot} sizes="(min-width: 640px) 360px, 92vw" />
+              </li>
+            ))}
+          </ul>
         </Part>
       )}
 
@@ -398,6 +436,8 @@ export default async function ProjectPage({ params }: Props) {
           </ButtonLink>
         </section>
       )}
+
+      {viewerShots.length > 0 && <ScreenshotViewer shots={viewerShots} />}
     </article>
   );
 }
