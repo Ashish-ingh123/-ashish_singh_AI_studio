@@ -737,7 +737,7 @@ export type Product = {
   promiseHeading: string;
   /** The financial-correctness rules in plain words, each built. */
   promises: { title: string; text: string }[];
-  /** The honest status line: built and tested in development, not yet at a hospital. */
+  /** The status line: release 1 built and tested, ready for a demo. */
   status: string;
   /** What the second button says: the way to the features. */
   featuresAction: string;
@@ -996,10 +996,10 @@ export const profile: Profile = {
         text: "One installation serves many hospitals, and no hospital ever sees another's data.",
       },
     ],
-    status: "Built and tested in development; not yet in use at a hospital.",
+    status: "Release 1 is built and tested, and ready for a demo.",
     featuresAction: "See the features",
     featuresIntro:
-      "Twelve parts, all built and tested in development. Each card says what it does today.",
+      "Twelve parts, all built and tested. Each card says what it does today.",
     features: [
       {
         icon: "patients",
@@ -1681,7 +1681,7 @@ export const profile: Profile = {
           "Release 1: v1.0.0, 24 November 2026",
           "Ledger: double-entry, reconciled nightly",
           "Refunds and adjustments: maker-checker",
-          "Built and tested in development",
+          "Release 1 built and tested",
         ],
       },
       tech: [
@@ -1697,7 +1697,7 @@ export const profile: Profile = {
         "Multi-tenant",
       ],
       description:
-        "Billing, payments and receivables software for hospitals and clinics in India: bills, credit notes, payments, refunds and adjustments under maker-checker, a double-entry receivables ledger with a nightly reconciliation built in, reports, printing on letterhead and an export for Tally. Built and tested in development; not yet in use at a hospital.",
+        "Billing, payments and receivables software for hospitals and clinics in India: bills, credit notes, payments, refunds and adjustments under maker-checker, a double-entry receivables ledger with a nightly reconciliation built in, reports, printing on letterhead and an export for Tally. Release 1 is built and tested, and ready for a demo.",
       highlights: [
         "Bills and credit notes with gapless numbers per hospital and financial year, and payments by cash, card, UPI, bank transfer or cheque, allocated to bills oldest first.",
         "Refunds, reversals and adjustments that take effect only after a second, different person approves.",
@@ -1718,7 +1718,7 @@ export const profile: Profile = {
         intro:
           "BillingRecon is billing, payments and receivables software for hospitals and clinics in India, built by Ashvanta Technologies on ASP.NET Core, EF Core and SQL Server with a React front end. It is designed to be the single source of truth for what each patient and guarantor owes.",
         statusSummary:
-          "Honest status: release 1 and the work after it are built and tested in development; BillingRecon is not yet in use at a hospital. Bank reconciliation, recovery, and insurance and corporate billing are planned.",
+          "Status: release 1 and the work after it are built and tested, and BillingRecon is ready for a demo. Bank reconciliation, recovery, and insurance and corporate billing are planned.",
         problem: {
           heading: "Overview and the problem it solves",
           paragraphs: [
@@ -1732,7 +1732,7 @@ export const profile: Profile = {
         modules: {
           heading: "Features in depth",
           intro:
-            "Twelve modules, all built and tested in development. Each shows its everyday workflow, step by step.",
+            "Twelve modules, all built and tested. Each shows its everyday workflow, step by step.",
           items: [
             {
               title: "Patients and payers",
