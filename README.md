@@ -1,14 +1,22 @@
-# Ashish Singh · Portfolio
+# Ashvanta Technologies · Website
 
 [![CI](https://github.com/Ashish-ingh123/-ashish_singh_AI_studio/actions/workflows/ci.yml/badge.svg)](https://github.com/Ashish-ingh123/-ashish_singh_AI_studio/actions/workflows/ci.yml)
 
-Personal portfolio site for Ashish Singh, Software Engineer (full-stack: C#, .NET, SQL Server,
-React; AI integration with RAG and LLMs). A single page presents the services he offers, his
-experience, skills, projects, education and certifications, and makes it easy to get in touch
-by phone, email, LinkedIn or GitHub. Projects with a case study get their own page under
-`/projects/<slug>`. A small question box, "Ask about Ashish", lets a visitor ask about him
-and get a short answer written by an AI model that knows only what this site says. A form in
-the Contact section, "Send your requirement", emails the details of a project to the owner.
+The website of Ashvanta Technologies ("Technology for a Better Tomorrow."), the software
+company founded by Ashish Singh. The home page presents the company and its product,
+**BillingRecon**, billing, payments and receivables software for hospitals and clinics in
+India: what it is, its twelve features (each marked Built or Planned), how it works, its
+releases and a real screen; then the custom work the company takes on, the company and its
+founder, the founder's experience and skills, and Contact. The full product page,
+`/projects/billingrecon`, goes module by module with animated workflows, the money rules with
+a double-entry table that fills in, security, reports and printing, operations, the
+architecture, dated test results, the roadmap and thirteen real screenshots. A question box,
+"Ask about Ashvanta", answers from what this site says, through an AI model. A form in the
+Contact section, "Request a demo or send your requirement", emails the request to the owner.
+
+Every BillingRecon claim comes from a fact sheet kept true to its repository
+(`BILLINGRECON-FACTS.md`, beside this repository): "Built" means built and tested in
+development, and no hospital uses it yet.
 
 **Live site:** _add the Vercel URL here after the first deploy_
 
@@ -39,8 +47,8 @@ Open <http://localhost:3000>. Pages reload as you edit.
 
 ### Environment variables
 
-The site runs, builds and passes CI without any. Only the "Ask about Ashish" box and the
-"Send your requirement" form need them, and without their values each shows a short "not
+The site runs, builds and passes CI without any. Only the "Ask about Ashvanta" box and the
+"Request a demo" form need them, and without their values each shows a short "not
 available" message instead of working.
 
 | Variable | Needed | What it is |
@@ -134,7 +142,7 @@ commands.
   that row holds four, a quarter of the row each on a wide screen; a group name of more
   than about 18 letters takes two lines there on a 1024px screen. Every skill is also
   listed in the page's structured data (`knowsAbout`) and is given to the AI model behind
-  "Ask about Ashish", so add only skills you can back up.
+  "Ask about Ashvanta", so add only skills you can back up.
 - **Site address:** leave `profile.siteUrl` empty until a custom domain exists. On Vercel the
   production URL is picked up automatically at build time. Once a domain is live, set
   `siteUrl` to it so canonical links, Open Graph tags, the sitemap, `robots.txt` and the
@@ -152,12 +160,12 @@ commands.
   lines (`src/components/steering-wheel.tsx`), with a Pause button. Its angles are an
   illustration, not model output, and the label that says so
   (`profile.labels.projects.steering.illustrative`) must stay for as long as that is true.
-- **Ask about Ashish:** every word of the question box is `profile.ask`: the heading, the
+- **Ask about Ashvanta:** every word of the question box is `profile.ask`: the heading, the
   suggested questions, the notice about where questions are sent, and the messages for
   when it is busy or unavailable. Keep the suggested questions answerable from this file.
   What the AI model is told (its rules, and which fields of `profile.ts` it may see) is
   `src/lib/ask-context.ts`; the mobile number is deliberately not among them.
-- **Send your requirement:** every word of the form in the Contact section is
+- **Request a demo or send your requirement:** every word of the form in the Contact section is
   `profile.contactForm`: the heading, each field's label, placeholder and error message, the
   timeline options, the button, the messages for sent, failed, unavailable and too many
   messages, the privacy line and the words of the email you receive. "What you need" lists
@@ -178,14 +186,28 @@ commands.
   Build statuses (`Built`, `Partly built`, `Designed`, `Not started`) must stay honest. Work
   that is designed but not built belongs under `planned`, never under `highlights`.
 
+## Keeping BillingRecon true
+
+- **The facts:** every BillingRecon sentence on the site comes from `BILLINGRECON-FACTS.md`, kept
+  beside this repository and true to BillingRecon's own repository. When BillingRecon changes,
+  re-read its repository, update the fact sheet, then the content below.
+- **The content:** `profile.product` (the home page's BillingRecon and Features sections, the
+  screenshots and their captions) and the BillingRecon entry of `profile.projects` (its
+  `caseStudy` is the product page). The releases are one list, `billingReconReleases`, shared
+  by both.
+- **The screenshots:** `node scripts/billingrecon-shots.mjs` reads BillingRecon's `docs/ui`,
+  crops and converts them to WebP in `public/images/billingrecon`, and prints each file's size,
+  which `profile.product.screenshots` must match. Run it after BillingRecon's screenshots are
+  retaken. It uses `sharp`, which Next.js already installs.
+
 ## Project structure
 
 ```
 src/
   app/                 Routes, metadata, generated icons, Open Graph images, sitemap, robots
     projects/[slug]/   Case study pages
-    api/ask/           Server route behind the "Ask about Ashish" box
-    api/contact/       Server route behind the "Send your requirement" form
+    api/ask/           Server route behind the "Ask about Ashvanta" box
+    api/contact/       Server route behind the demo and requirement form
     styles/            Section-specific CSS, imported by globals.css
   components/          Shared UI (header, footer, logo, theme toggle, reveal animations,
                        badges, orb, the hero's canvas field, the drawings on the service

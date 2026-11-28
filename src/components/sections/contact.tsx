@@ -122,7 +122,7 @@ export function Contact() {
       </div>
 
       {/*
-        "Send your requirement". What a visitor must always be able to read is rendered
+        "Request a demo or send your requirement". What a visitor must always be able to read is rendered
         here, on the server: the heading, the intro and the line about what happens to
         the details. Only the working part (the fields and the result) is loaded later,
         by ContactFormLoader. A glass card without the hover lift: a form should stay put.

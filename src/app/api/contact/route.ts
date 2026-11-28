@@ -17,7 +17,7 @@ import { allowedOrigin, clientAddress, createLimiter } from "@/lib/request-guard
 import { siteUrl } from "@/lib/site";
 
 /*
-  The server side of the "Send your requirement" form. The browser posts the fields as
+  The server side of the "Request a demo" form. The browser posts the fields as
   JSON; this handler checks them again (the browser's own check is only a courtesy) and
   sends the site's owner one plain-text email through Resend's REST API. Like /api/ask,
   it is a small ASP.NET minimal API endpoint between the page and the provider, so the
@@ -34,7 +34,7 @@ const RESEND_URL = "https://api.resend.com/emails";
  */
 const DEFAULT_FROM = "onboarding@resend.dev";
 /** Resend rejects a request that carries no User-Agent (403, error 1010). */
-const USER_AGENT = "portfolio-contact-form/1.0";
+const USER_AGENT = "ashvanta-contact-form/1.0";
 /** The values .env.example ships with. They are placeholders, so they count as "not set". */
 const PLACEHOLDER_KEY = "your-key-here";
 const PLACEHOLDER_TO = "you@example.com";

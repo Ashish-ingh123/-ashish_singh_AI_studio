@@ -15,7 +15,7 @@ const ContactForm = dynamic(
 export const CONTACT_FORM_EVENT = "contact-form:open";
 
 /**
- * Holds the place of the "Send your requirement" form and loads it at the last sensible
+ * Holds the place of the "Request a demo" form and loads it at the last sensible
  * moment: when the visitor has scrolled to within a screen of it, or when the command
  * palette asks for it. So its code is never part of what the first screen downloads.
  *

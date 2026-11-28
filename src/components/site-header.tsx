@@ -49,7 +49,7 @@ export function SiteHeader() {
   const [paletteWanted, setPaletteWanted] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
-  // The header's own "Start a project" button. It is shown while the hero's button is
+  // The header's own "Request a demo" button. It is shown while the hero's button is
   // off screen, and on pages that have no hero at all, so the way to get in touch is
   // always one click away without ever being on screen twice.
   const [actionShown, setActionShown] = useState(false);

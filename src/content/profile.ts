@@ -399,7 +399,7 @@ export type Ask = {
   empty: string;
 };
 
-/** The fields of the "Send your requirement" form, in the order they are shown. */
+/** The fields of the "Request a demo" form, in the order they are shown. */
 export type ContactField =
   | "name"
   | "email"
@@ -431,7 +431,7 @@ export type ContactFieldWords = {
 };
 
 /**
- * The words of the "Send your requirement" form in the Contact section. A visitor fills
+ * The words of the "Request a demo" form in the Contact section. A visitor fills
  * in what they need, and the details are sent to the site's owner as one email. Nothing
  * is stored on the site, and the privacy line must keep saying what really happens.
  */
@@ -677,6 +677,11 @@ export type Project = {
   description: string;
   /** Work that is actually built and verified. */
   highlights: string[];
+  /**
+   * The page's search-result and link-preview description (Step 8 of the Ashvanta site);
+   * the tagline when absent. Keep it under about 155 characters.
+   */
+  seoDescription?: string;
   /** Work that is designed but not built yet. Never shown as done. */
   planned?: string[];
   links?: {
@@ -1663,6 +1668,8 @@ export const profile: Profile = {
     {
       name: "BillingRecon",
       tagline: "Billing, payments and receivables for hospitals in India",
+      seoDescription:
+        "Billing, payments and receivables software for hospitals and clinics in India: a double-entry ledger, maker-checker approvals and printing on letterhead.",
       status: "In progress",
       slug: "billingrecon",
       // BillingRecon has its own sections on the homepage (product, features); this entry

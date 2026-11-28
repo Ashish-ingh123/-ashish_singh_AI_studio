@@ -59,9 +59,26 @@ export function SiteJsonLd() {
     }),
   };
 
+  // The company's product (Step 8 of the Ashvanta site, 2026-11-28): what it is, for whom,
+  // on what, and who makes it. No rating, review, price or offer: none exists, and
+  // schema.org's would be read as claims.
+  const billingRecon = profile.projects.find((project) => project.slug === "billingrecon");
+  const application = billingRecon && {
+    "@type": "SoftwareApplication",
+    "@id": `${home}#billingrecon`,
+    name: billingRecon.name,
+    description: billingRecon.seoDescription ?? billingRecon.tagline,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    url: new URL(`/projects/${billingRecon.slug}`, siteUrl).toString(),
+    image: new URL(`/images/billingrecon/dashboard-built.webp`, siteUrl).toString(),
+    creator: { "@id": organizationId },
+    publisher: { "@id": organizationId },
+  };
+
   const data = {
     "@context": "https://schema.org",
-    "@graph": [organization, person],
+    "@graph": application ? [organization, person, application] : [organization, person],
   };
 
   return (

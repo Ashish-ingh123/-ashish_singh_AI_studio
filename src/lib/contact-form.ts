@@ -7,7 +7,7 @@ import {
 } from "@/content/profile";
 
 /*
-  The rules of the "Send your requirement" form, in one place. The form in the browser
+  The rules of the "Request a demo" form, in one place. The form in the browser
   and the server route both call validateContact, so a rule can never differ between the
   two. Think of one validator class used by a Blazor form and again by the controller
   it posts to: the browser's check is for the visitor's comfort, the server's is the one

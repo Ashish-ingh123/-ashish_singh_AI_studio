@@ -39,7 +39,7 @@ const controlClasses =
   "w-full min-w-0 rounded-xl border bg-muted/60 px-3.5 text-base text-foreground placeholder:text-muted-foreground";
 
 /**
- * The working part of "Send your requirement": the fields, the send button and the
+ * The working part of "Request a demo or send your requirement": the fields, the send button and the
  * result. It checks the fields with the same function the server uses
  * (src/lib/contact-form.ts), posts them to /api/contact and says what happened.
  *

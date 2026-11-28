@@ -43,17 +43,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // not-found page the homepage's title.
   if (!project) notFound();
   const path = caseStudyPath(project);
+  const description = project.seoDescription ?? project.tagline;
   return {
     // The root layout's title template appends the company's name.
     title: project.name,
-    description: project.tagline,
+    description,
     alternates: { canonical: path },
     // A page's openGraph replaces the layout's whole openGraph object, so siteName repeats.
     openGraph: {
       type: "article",
       siteName: profile.brand.name,
       title: project.name,
-      description: project.tagline,
+      description,
       url: path,
     },
   };

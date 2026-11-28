@@ -23,7 +23,7 @@
   }
 
   /*
-    The place the "Send your requirement" form is loaded into (contact-form-loader.tsx).
+    The place the "Request a demo" form is loaded into (contact-form-loader.tsx).
     It is given the height of the form at rest, so the card does not grow, and nothing
     below it moves, when the form arrives. A phone stacks the fields one to a row; from
     sm they go two to a row. Measured 2026-11-28 with the type-of-organisation field: 61.75rem
